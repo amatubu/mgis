@@ -1,0 +1,533 @@
+// !$*UTF8*$!
+{
+	29B97313FDCFA39411CA2CEA /* Project object */ = {
+		activeBuildConfigurationName = Debug;
+		activeExecutable = 2F76F5491148EEBB00CDBF71 /* mgis */;
+		activeTarget = 8D1107260486CEB800E47090 /* mgis */;
+		addToTargets = (
+			8D1107260486CEB800E47090 /* mgis */,
+		);
+		breakpoints = (
+			2F76F5DB11490CC700CDBF71 /* MGISView.m:68 */,
+			2F76F6151149165200CDBF71 /* MGISView.m:82 */,
+			2F76F63111491D4900CDBF71 /* MGISView.m:142 */,
+			2F76F63511491D8900CDBF71 /* MGISView.m:154 */,
+			2F76F63A11491E2A00CDBF71 /* MGISView.m:163 */,
+			2F87C34C114945D5009C3843 /* MGISView.m:221 */,
+			2F87C39711494A5D009C3843 /* MGISView.m:62 */,
+			2F87C3A511494AE9009C3843 /* MGISView.m:293 */,
+			2F87C3F51149527A009C3843 /* MGISView.m:108 */,
+			2F87C4371149593C009C3843 /* MGISView.m:169 */,
+			2F87C52C11497A9F009C3843 /* MGISView.m:181 */,
+		);
+		codeSenseManager = 2F76F5561148EEDB00CDBF71 /* Code sense */;
+		executables = (
+			2F76F5491148EEBB00CDBF71 /* mgis */,
+		);
+		perUserDictionary = {
+			"PBXConfiguration.PBXBreakpointsDataSource.v1:1CA1AED706398EBD00589147" = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXBreakpointsDataSource_BreakpointID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					20,
+					198,
+					20,
+					99,
+					99,
+					29,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXBreakpointsDataSource_ActionID,
+					PBXBreakpointsDataSource_TypeID,
+					PBXBreakpointsDataSource_BreakpointID,
+					PBXBreakpointsDataSource_UseID,
+					PBXBreakpointsDataSource_LocationID,
+					PBXBreakpointsDataSource_ConditionID,
+					PBXBreakpointsDataSource_IgnoreCountID,
+					PBXBreakpointsDataSource_ContinueID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					644,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 290272048;
+			PBXWorkspaceStateSaveDate = 290272048;
+		};
+		perUserProjectItems = {
+			2F6470FB114D33330030B47A /* PBXTextBookmark */ = 2F6470FB114D33330030B47A /* PBXTextBookmark */;
+			2F6470FE114D33330030B47A /* PBXTextBookmark */ = 2F6470FE114D33330030B47A /* PBXTextBookmark */;
+			2F6470FF114D33330030B47A /* PBXTextBookmark */ = 2F6470FF114D33330030B47A /* PBXTextBookmark */;
+			2F76F5A91149064C00CDBF71 = 2F76F5A91149064C00CDBF71 /* PBXTextBookmark */;
+			2F76F5AA1149064C00CDBF71 = 2F76F5AA1149064C00CDBF71 /* PBXTextBookmark */;
+			2F76F5AB1149064C00CDBF71 = 2F76F5AB1149064C00CDBF71 /* PlistBookmark */;
+			2F87C378114946A3009C3843 = 2F87C378114946A3009C3843 /* PBXTextBookmark */;
+			2F87C48411495E0B009C3843 = 2F87C48411495E0B009C3843 /* PBXBookmark */;
+			2F87C4A71149663B009C3843 = 2F87C4A71149663B009C3843 /* PBXTextBookmark */;
+			2F87C53111497AAB009C3843 = 2F87C53111497AAB009C3843 /* PBXTextBookmark */;
+			2F87C53C11497C25009C3843 = 2F87C53C11497C25009C3843 /* PBXTextBookmark */;
+			2F87C53D11497C25009C3843 = 2F87C53D11497C25009C3843 /* PBXTextBookmark */;
+			2F87C55611497F91009C3843 = 2F87C55611497F91009C3843 /* PBXTextBookmark */;
+			2F87C55711497F91009C3843 = 2F87C55711497F91009C3843 /* PBXTextBookmark */;
+			2F87C55811497F91009C3843 = 2F87C55811497F91009C3843 /* PBXTextBookmark */;
+		};
+		sourceControlManager = 2F76F5551148EEDB00CDBF71 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	29B97316FDCFA39411CA2CEA /* main.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {563, 365}}";
+			sepNavSelRange = "{92, 0}";
+			sepNavVisRange = "{0, 245}";
+			sepNavWindowFrame = "{{38, 67}, {688, 653}}";
+		};
+	};
+	2F6470FB114D33330030B47A /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		name = "MGISView.m: 184";
+		rLen = 0;
+		rLoc = 5082;
+		rType = 0;
+		vrLen = 1591;
+		vrLoc = 4403;
+	};
+	2F6470FE114D33330030B47A /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		name = "MGISView.m: 193";
+		rLen = 0;
+		rLoc = 5372;
+		rType = 0;
+		vrLen = 1684;
+		vrLoc = 3920;
+	};
+	2F6470FF114D33330030B47A /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 2F76F56D1148F20200CDBF71 /* MGISView.h */;
+		name = "MGISView.h: 44";
+		rLen = 0;
+		rLoc = 1026;
+		rType = 0;
+		vrLen = 1219;
+		vrLoc = 353;
+	};
+	2F76F5491148EEBB00CDBF71 /* mgis */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		dataTipCustomDataFormattersEnabled = 1;
+		dataTipShowTypeColumn = 1;
+		dataTipSortType = 0;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = mgis;
+		savedGlobals = {
+		};
+		showTypeColumn = 0;
+		sourceDirectories = (
+		);
+		variableFormatDictionary = {
+		};
+	};
+	2F76F5551148EEDB00CDBF71 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	2F76F5561148EEDB00CDBF71 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	2F76F56D1148F20200CDBF71 /* MGISView.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {629, 1014}}";
+			sepNavSelRange = "{1026, 0}";
+			sepNavVisRange = "{353, 1219}";
+			sepNavWindowFrame = "{{123, 61}, {688, 653}}";
+		};
+	};
+	2F76F56E1148F20200CDBF71 /* MGISView.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {814, 5366}}";
+			sepNavSelRange = "{5372, 0}";
+			sepNavVisRange = "{3920, 1684}";
+			sepNavWindowFrame = "{{153, 21}, {873, 876}}";
+		};
+	};
+	2F76F5A91149064C00CDBF71 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 32CA4F630368D1EE00C91783 /* mgis_Prefix.pch */;
+		name = "mgis_Prefix.pch: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 139;
+		vrLoc = 0;
+	};
+	2F76F5AA1149064C00CDBF71 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 29B97316FDCFA39411CA2CEA /* main.m */;
+		name = "main.m: 6";
+		rLen = 0;
+		rLoc = 92;
+		rType = 0;
+		vrLen = 245;
+		vrLoc = 0;
+	};
+	2F76F5AB1149064C00CDBF71 /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = 8D1107310486CEB800E47090 /* Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+		);
+		name = /Users/sent/work/mgis/mgis/Info.plist;
+		rLen = 0;
+		rLoc = 2147483647;
+	};
+	2F76F5DB11490CC700CDBF71 /* MGISView.m:68 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		functionName = "-drawRect:";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 68;
+		location = mgis;
+		modificationTime = 290028200.703162;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	2F76F6151149165200CDBF71 /* MGISView.m:82 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		functionName = "-drawRect:";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 82;
+		location = mgis;
+		modificationTime = 290028200.737232;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	2F76F63111491D4900CDBF71 /* MGISView.m:142 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		functionName = "-mouseDown:";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 142;
+		location = mgis;
+		modificationTime = 290028200.747389;
+		originalNumberOfMultipleMatches = 0;
+		state = 2;
+	};
+	2F76F63511491D8900CDBF71 /* MGISView.m:154 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		functionName = "-mouseDragged:";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 154;
+		location = mgis;
+		modificationTime = 290028200.78514;
+		originalNumberOfMultipleMatches = 0;
+		state = 2;
+	};
+	2F76F63A11491E2A00CDBF71 /* MGISView.m:163 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		functionName = "-mouseDragged:";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 163;
+		location = mgis;
+		modificationTime = 290028200.794318;
+		originalNumberOfMultipleMatches = 0;
+		state = 2;
+	};
+	2F76F6991149315E00CDBF71 /* NSGeometry.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = NSGeometry.h;
+		path = /Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks/Foundation.framework/Versions/C/Headers/NSGeometry.h;
+		sourceTree = "<absolute>";
+	};
+	2F87C33B1149446B009C3843 /* CentsWindow.m */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.objc;
+		name = CentsWindow.m;
+		path = /Users/sent/work/Cents/CentsWindow.m;
+		sourceTree = "<absolute>";
+	};
+	2F87C34C114945D5009C3843 /* MGISView.m:221 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		functionName = "-changeZoomLevel:";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 221;
+		location = mgis;
+		modificationTime = 290028200.802321;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	2F87C378114946A3009C3843 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 2F87C33B1149446B009C3843 /* CentsWindow.m */;
+		name = "CentsWindow.m: 5";
+		rLen = 0;
+		rLoc = 65;
+		rType = 0;
+		vrLen = 1067;
+		vrLoc = 0;
+	};
+	2F87C39711494A5D009C3843 /* MGISView.m:62 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		functionName = "-drawRect:";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 62;
+		location = mgis;
+		modificationTime = 290028200.809795;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	2F87C3A511494AE9009C3843 /* MGISView.m:293 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		functionName = "-getMiddleMesh:";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 293;
+		location = mgis;
+		modificationTime = 290028200.817887;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	2F87C3F51149527A009C3843 /* MGISView.m:108 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		functionName = "-drawRect:";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 108;
+		location = mgis;
+		modificationTime = 290028200.826905;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	2F87C4371149593C009C3843 /* MGISView.m:169 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		functionName = "-mouseDragged:";
+		hitCount = 1;
+		ignoreCount = 0;
+		lineNumber = 169;
+		location = mgis;
+		modificationTime = 290028576.0728719;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	2F87C48411495E0B009C3843 /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = 2F76F56D1148F20200CDBF71 /* MGISView.h */;
+	};
+	2F87C4A71149663B009C3843 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		comments = "'getMeterPerPixel' undeclared (first use in this function)";
+		fRef = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		rLen = 1;
+		rLoc = 192;
+		rType = 1;
+	};
+	2F87C52C11497A9F009C3843 /* MGISView.m:181 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		functionName = "-updateInfoWindow";
+		hitCount = 3;
+		ignoreCount = 0;
+		lineNumber = 181;
+		location = mgis;
+		modificationTime = 290028578.034915;
+		originalNumberOfMultipleMatches = 1;
+		state = 1;
+	};
+	2F87C53111497AAB009C3843 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 2F76F56D1148F20200CDBF71 /* MGISView.h */;
+		name = "MGISView.h: 70";
+		rLen = 0;
+		rLoc = 1765;
+		rType = 0;
+		vrLen = 1593;
+		vrLoc = 261;
+	};
+	2F87C53C11497C25009C3843 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 2F76F6991149315E00CDBF71 /* NSGeometry.h */;
+		name = "NSGeometry.h: 80";
+		rLen = 0;
+		rLoc = 1661;
+		rType = 0;
+		vrLen = 1068;
+		vrLoc = 1143;
+	};
+	2F87C53D11497C25009C3843 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		rLen = 0;
+		rLoc = 181;
+		rType = 1;
+	};
+	2F87C55611497F91009C3843 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		name = "MGISView.m: 184";
+		rLen = 0;
+		rLoc = 5082;
+		rType = 0;
+		vrLen = 1600;
+		vrLoc = 4403;
+	};
+	2F87C55711497F91009C3843 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 2F76F56E1148F20200CDBF71 /* MGISView.m */;
+		name = "MGISView.m: 193";
+		rLen = 0;
+		rLoc = 5372;
+		rType = 0;
+		vrLen = 1717;
+		vrLoc = 3887;
+	};
+	2F87C55811497F91009C3843 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 2F76F56D1148F20200CDBF71 /* MGISView.h */;
+		name = "MGISView.h: 44";
+		rLen = 0;
+		rLoc = 1026;
+		rType = 0;
+		vrLen = 1247;
+		vrLoc = 325;
+	};
+	32CA4F630368D1EE00C91783 /* mgis_Prefix.pch */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {563, 365}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 139}";
+		};
+	};
+	8D1107260486CEB800E47090 /* mgis */ = {
+		activeExec = 0;
+		executables = (
+			2F76F5491148EEBB00CDBF71 /* mgis */,
+		);
+	};
+}
