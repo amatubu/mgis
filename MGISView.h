@@ -50,6 +50,8 @@ typedef enum {
     NSPoint scrollOrigin;
 
 	ZoomLevel zoom;
+	NSImage *offscreenImage;
+	BOOL dragging;
 
 	NSString *map_folder;
 	NSString *map_suffix;

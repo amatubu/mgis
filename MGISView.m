@@ -38,6 +38,8 @@
 		//   最後に選んだものを記録するようにしたい
 		zoom = ZoomLarge;
 
+		dragging = NO;
+		
 		// 情報ウィンドウやスケールの内容を更新する
 		// TODO:
 		//   適切な場所に移動すべき
@@ -60,77 +62,87 @@
 	// x は、画面の左下の座標(原点)の地図上の横位置
 	// x_offset は、そこに表示すべき地図の、原点からのオフセット
 	float x = center_x - rect.size.width / 2.0 * meterPerPixel;
+	float y = center_y - rect.size.height / 2.0 * meterPerPixel;
 	float x_offset = - ( x - floor( x / mapWidth ) * mapWidth ) / meterPerPixel;
+	float y_offset = - ( y - floor( y / mapHeight ) * mapHeight ) / meterPerPixel;
 
-	// オフセットが画面の一番上に逹っするまで繰り返す
-	while ( x_offset < rect.size.width ) {
-		// x は、画面の左下の座標(原点)の地図上の縦位置
-		// y_offset は、そこに表示すべき地図の、原点からのオフセット
-		float y = center_y - rect.size.height / 2.0 * meterPerPixel;
-		float y_offset = - ( y - floor( y / mapHeight ) * mapHeight ) / meterPerPixel;
+	if ( dragging ) {
+	} else {
+		float offscreenWidth = MAP_IMAGE_WIDTH * ( floor( ( rect.size.width - x_offset ) / MAP_IMAGE_WIDTH ) + 1 );
+		float offscreenHeight = MAP_IMAGE_HEIGHT * ( floor( ( rect.size.height - y_offset ) / MAP_IMAGE_HEIGHT ) + 1 );
 
-		// オフセットが画面の一番右に逹っするまで繰り返す
-		while ( y_offset < rect.size.height ) {
-			// LARGE サイズのメッシュッコードを得る
-			// MIDDLE、DETAIL サイズについても、このコードを使う
-			NSString *meshString = [self getLargeMesh:NSMakePoint( x, y )];
+		offscreenImage = [[NSImage alloc] initWithSize:NSMakeSize( offscreenWidth, offscreenHeight )];
+		[offscreenImage lockFocus];
 
-			NSString *mapFile;
-			switch (zoom) {
-				case ZoomLarge:
-					// LARGE サイズの場合は、LARGE フォルダに「メッシュコード名.*」という形式で保存されている
-					mapFile = [NSString stringWithFormat:@"%@LARGE/%@%@%@",
-							   map_folder,@"06",meshString,map_suffix];
-					break;
-				case ZoomMiddle:
-					// MIDDLE サイズの場合は、MIDDLE フォルダの中に、そのメッシュを含む LARGE サイズの
-					// メッシュコード名のフォルダがあり、その中に保存されている
-				{
-					NSString *middleMeshString = [self getMiddleMesh:NSMakePoint( x, y )];
-					mapFile = [NSString stringWithFormat:@"%@MIDDLE/%@%@/%@%@%@%@",
-							   map_folder,@"06",meshString,@"06",meshString,middleMeshString,map_suffix];
+		float imageOffsetX = 0;
+		// オフセットが画面の一番上に逹っするまで繰り返す
+		while ( imageOffsetX < offscreenWidth ) {
+			// x は、画面の左下の座標(原点)の地図上の縦位置
+			// y_offset は、そこに表示すべき地図の、原点からのオフセット
+			float y = center_y - rect.size.height / 2.0 * meterPerPixel;
+			float imageOffsetY = 0;
+
+			// オフセットが画面の一番右に逹っするまで繰り返す
+			while ( imageOffsetY < offscreenHeight ) {
+				// LARGE サイズのメッシュッコードを得る
+				// MIDDLE、DETAIL サイズについても、このコードを使う
+				NSString *meshString = [self getLargeMesh:NSMakePoint( x, y )];
+
+				NSString *mapFile;
+				switch (zoom) {
+					case ZoomLarge:
+						// LARGE サイズの場合は、LARGE フォルダに「メッシュコード名.*」という形式で保存されている
+						mapFile = [NSString stringWithFormat:@"%@LARGE/%@%@%@",
+								   map_folder,@"06",meshString,map_suffix];
+						break;
+					case ZoomMiddle:
+						// MIDDLE サイズの場合は、MIDDLE フォルダの中に、そのメッシュを含む LARGE サイズの
+						// メッシュコード名のフォルダがあり、その中に保存されている
+					{
+						NSString *middleMeshString = [self getMiddleMesh:NSMakePoint( x, y )];
+						mapFile = [NSString stringWithFormat:@"%@MIDDLE/%@%@/%@%@%@%@",
+								   map_folder,@"06",meshString,@"06",meshString,middleMeshString,map_suffix];
+					}
+						break;
+					case ZoomDetail:
+						// DETAIL サイズの場合は、DETAIL フォルダの中に、そのメッシュを含む LARGE サイズの
+						// メッシュコード名のフォルダがあり、その中に保存されている
+					{
+						NSString *detailMeshString = [self getDetailMesh:NSMakePoint( x, y )];
+						mapFile = [NSString stringWithFormat:@"%@DETAIL/%@%@/%@%@%@%@",
+								   map_folder,@"06",meshString,@"06",meshString,detailMeshString,map_suffix];
+					}
+						break;
+					default:
+						// TODO:
+						//   Large2、Middle2 が未サポート
+						return;
 				}
-					break;
-				case ZoomDetail:
-					// DETAIL サイズの場合は、DETAIL フォルダの中に、そのメッシュを含む LARGE サイズの
-					// メッシュコード名のフォルダがあり、その中に保存されている
-				{
-					NSString *detailMeshString = [self getDetailMesh:NSMakePoint( x, y )];
-					mapFile = [NSString stringWithFormat:@"%@DETAIL/%@%@/%@%@%@%@",
-							   map_folder,@"06",meshString,@"06",meshString,detailMeshString,map_suffix];
+				
+				NSLog([NSString stringWithFormat:@"Map file: %@", mapFile]);
+				NSLog(@"Offset: %.3f, %.3f", x_offset, y_offset);
+
+				// 画像ファイルを得る
+				NSImage *anImage = [[NSImage alloc] initWithContentsOfFile:mapFile];
+				if ( anImage ) {
+					// NSImage が得られたら、計算しておいたオフセットの位置へ描画する
+					[anImage compositeToPoint:NSMakePoint( imageOffsetX, imageOffsetY ) operation:NSCompositeSourceOver];
+					[anImage release];
 				}
-					break;
-				default:
-					// TODO:
-					//   Large2、Middle2 が未サポート
-					return;
+	//			[fileUrl release];
+				
+				// Y 方向の次のメッシュへ
+				y += MAP_IMAGE_HEIGHT * meterPerPixel;
+				imageOffsetY += MAP_IMAGE_HEIGHT;
 			}
-			
-			NSLog([NSString stringWithFormat:@"Map file: %@", mapFile]);
-			NSLog(@"Offset: %.3f, %.3f", x_offset, y_offset);
-
-			// NSString からファイル URL へ
-			NSURL *fileUrl = [NSURL fileURLWithPath:mapFile];
-//			[mapFile release];
-
-			// 画像ファイルを得る
-			NSImage *anImage = [[NSImage alloc] init];
-			if ( [anImage initWithContentsOfURL:fileUrl] ) {
-				// NSImage が得られたら、計算しておいたオフセットの位置へ描画する
-				[anImage compositeToPoint:NSMakePoint( x_offset, y_offset ) operation:NSCompositeSourceOver];
-				[anImage release];
-			}
-//			[fileUrl release];
-			
-			// Y 方向の次のメッシュへ
-			y += MAP_IMAGE_HEIGHT * meterPerPixel;
-			y_offset += MAP_IMAGE_HEIGHT;
+			// X 方向の次のメッシュへ
+			x += MAP_IMAGE_WIDTH * meterPerPixel;
+			imageOffsetX += MAP_IMAGE_WIDTH;
 		}
-		// X 方向の次のメッシュへ
-		x += MAP_IMAGE_WIDTH * meterPerPixel;
-		x_offset += MAP_IMAGE_WIDTH;
+		[offscreenImage unlockFocus];
 	}
-
+	[offscreenImage compositeToPoint:NSMakePoint( x_offset, y_offset ) operation:NSCompositeSourceOver];
+	
 	[self drawCenterMarker:(NSRect)rect];
 }
 
@@ -140,6 +152,7 @@
 {
 	// マウスボタンが押された座標を記録しておく
     grabOrigin = [event locationInWindow];
+	dragging = YES;
 } // mouseDown
 
 // ビュー上でドラッグされた際に呼ばれる
@@ -162,12 +175,22 @@
 	float meterPerPixel = [self getMeterPerPixel];
 	center_x += deltaX * meterPerPixel;
 	center_y -= deltaY * meterPerPixel;
+	
 
 	// ビューの内容を更新する必要があることを伝える
 	[self setNeedsDisplay:YES];
 	[self updateInfoWindow];
 	
 } // mouseDragged
+
+- (void) mouseUp: (NSEvent *) event
+{
+	NSPoint mousePoint;
+	mousePoint = [event locationInWindow];
+	
+	dragging = NO;
+	[self setNeedsDisplay:YES];
+}
 
 // 情報ウィンドウの内容を更新する
 // 現在は中心点の直交座標系での座標のみを表示
