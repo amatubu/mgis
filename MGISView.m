@@ -89,6 +89,13 @@
 	float x_offset = - ( x - floor( x / mapWidth ) * mapWidth ) / meterPerPixel;
 	float y_offset = - ( y - floor( y / mapHeight ) * mapHeight ) / meterPerPixel;
 
+	float mapImageWidth  = MAP_IMAGE_WIDTH;
+	float mapImageHeight = MAP_IMAGE_HEIGHT;
+	if ( zoom == ZoomLarge2 || zoom == ZoomMiddle2 ) {
+		mapImageWidth  /= 2.0;
+		mapImageHeight /= 2.0;
+	}
+	
 	if ( dragging ) {
 		x = scrollOrigin.x - [self bounds].size.width / 2.0 * meterPerPixel;
 		y = scrollOrigin.y - [self bounds].size.height / 2.0 * meterPerPixel;
@@ -99,8 +106,8 @@
 	} else {
 		// TODO:
 		//   新しく画像を作成しなくてもよいケースもあるので調整する
-		float offscreenWidth = MAP_IMAGE_WIDTH * ( floor( ( [self bounds].size.width - x_offset ) / MAP_IMAGE_WIDTH ) + 1 );
-		float offscreenHeight = MAP_IMAGE_HEIGHT * ( floor( ( [self bounds].size.height - y_offset ) / MAP_IMAGE_HEIGHT ) + 1 );
+		float offscreenWidth = mapImageWidth * ( floor( ( [self bounds].size.width - x_offset ) / mapImageWidth ) + 1 );
+		float offscreenHeight = mapImageHeight * ( floor( ( [self bounds].size.height - y_offset ) / mapImageHeight ) + 1 );
 
 		// TODO:
 		//   たぶんメモリリークしている
@@ -125,11 +132,13 @@
 				NSString *mapFile;
 				switch (zoom) {
 					case ZoomLarge:
+					case ZoomLarge2:
 						// LARGE サイズの場合は、LARGE フォルダに「メッシュコード名.*」という形式で保存されている
 						mapFile = [NSString stringWithFormat:@"%@LARGE/%@%@%@",
-								   map_folder,@"06",meshString,map_suffix];
+								   map_folder, @"06", meshString, map_suffix];
 						break;
 					case ZoomMiddle:
+					case ZoomMiddle2:
 						// MIDDLE サイズの場合は、MIDDLE フォルダの中に、そのメッシュを含む LARGE サイズの
 						// メッシュコード名のフォルダがあり、その中に保存されている
 					{
@@ -148,9 +157,7 @@
 					}
 						break;
 					default:
-						// TODO:
-						//   Large2、Middle2 が未サポート
-						return;
+						continue;
 				}
 				
 				NSLog(@"Map file: %@", mapFile);
@@ -160,18 +167,21 @@
 				NSImage *anImage = [[NSImage alloc] initWithContentsOfFile:mapFile];
 				if ( anImage ) {
 					// NSImage が得られたら、計算しておいたオフセットの位置へ描画する
-					[anImage compositeToPoint:NSMakePoint( imageOffsetX, imageOffsetY ) operation:NSCompositeSourceOver];
+//					[anImage compositeToPoint:NSMakePoint( imageOffsetX, imageOffsetY ) operation:NSCompositeSourceOver];
+					[anImage drawInRect:NSMakeRect( imageOffsetX, imageOffsetY, mapImageWidth, mapImageHeight )
+						       fromRect:NSMakeRect( 0, 0, MAP_IMAGE_WIDTH, MAP_IMAGE_HEIGHT )
+							  operation:NSCompositeSourceOver fraction:1.0];
 					[anImage release];
 				}
 	//			[fileUrl release];
 				
 				// Y 方向の次のメッシュへ
-				y += MAP_IMAGE_HEIGHT * meterPerPixel;
-				imageOffsetY += MAP_IMAGE_HEIGHT;
+				y += mapImageHeight * meterPerPixel;
+				imageOffsetY += mapImageHeight;
 			}
 			// X 方向の次のメッシュへ
-			x += MAP_IMAGE_WIDTH * meterPerPixel;
-			imageOffsetX += MAP_IMAGE_WIDTH;
+			x += mapImageWidth * meterPerPixel;
+			imageOffsetX += mapImageWidth;
 		}
 		[offscreenImage unlockFocus];
 	}
@@ -255,19 +265,19 @@
 	[scale setStringValue:[NSString stringWithFormat:@"%d m", (int)meterPer80Pixels]];
 }
 
-//
+// 中心に印を表示する
 - (void) drawCenterMarker: (NSRect)viewRect {
 	[[NSColor redColor] set];
 	NSRect r;
 	r= NSMakeRect( viewRect.size.width / 2.0 - 1.0,
-						   viewRect.size.height / 2.0 - 10.0,
+						  viewRect.size.height / 2.0 - 10.0,
 						   2.0,
 						  20.0 );
 	NSRectFill(r);
 	r = NSMakeRect( viewRect.size.width / 2.0 - 10.0,
 						  viewRect.size.height / 2.0 - 1.0,
 						  20.0,
-						  2.0 );
+						   2.0 );
 	NSRectFill(r);
 }
 
@@ -333,7 +343,7 @@
 // LARGE サイズのメッシュコードを得る
 - (NSString *)getLargeMesh:(NSPoint)pt {
 	int y_1 = floor( pt.y / MESH_HEIGHT );
-	int x_1 = floor( pt.x / MESH_WIDTH );
+	int x_1 = floor( pt.x / MESH_WIDTH  );
 	NSLog(@"First : %d, %d", x_1, y_1);
 	char meshCode[5];
 	[self getFirstMesh:&meshCode[0] x:x_1 y:y_1];
@@ -412,13 +422,13 @@
 			mapWidth = LARGE_MAP_WIDTH;
 			break;
 		case ZoomLarge2:
-			mapWidth = LARGE_MAP_WIDTH / 2;
+			mapWidth = LARGE_MAP_WIDTH;
 			break;
 		case ZoomMiddle:
 			mapWidth = MIDDLE_MAP_WIDTH;
 			break;
 		case ZoomMiddle2:
-			mapWidth = MIDDLE_MAP_WIDTH / 2;
+			mapWidth = MIDDLE_MAP_WIDTH;
 			break;
 		case ZoomDetail:
 			mapWidth = DETAIL_MAP_WIDTH;
@@ -437,13 +447,13 @@
 			mapHeight = LARGE_MAP_HEIGHT;
 			break;
 		case ZoomLarge2:
-			mapHeight = LARGE_MAP_HEIGHT / 2;
+			mapHeight = LARGE_MAP_HEIGHT;
 			break;
 		case ZoomMiddle:
 			mapHeight = MIDDLE_MAP_HEIGHT;
 			break;
 		case ZoomMiddle2:
-			mapHeight = MIDDLE_MAP_HEIGHT / 2;
+			mapHeight = MIDDLE_MAP_HEIGHT;
 			break;
 		case ZoomDetail:
 			mapHeight = DETAIL_MAP_HEIGHT;
@@ -560,17 +570,17 @@
 	double eta4 = eta2 * eta2;
 
 	// Xを第4項まで計算する
-	double x1 =  ( 1.0 / 2.0 ) * n * pow( cp, 2.0 ) * t * pow( dr, 2.0 );
-	double x2 =  ( 1.0 / 24.0 ) * n * pow( cp, 4.0 ) * t * ( 5 - t2 + 9 * eta2 + 4 * eta4 ) * pow( dr, 4.0 );
-	double x3 = -( 1.0 / 720.0 ) * n * pow( cp, 6.0 ) * t * ( -61 + 58 * t2 - t4 - 270 * eta2 + 330 * t2 * eta2 ) * pow( dr, 6.0 );
+	double x1 =  ( 1.0 /     2.0 ) * n * pow( cp, 2.0 ) * t * pow( dr, 2.0 );
+	double x2 =  ( 1.0 /    24.0 ) * n * pow( cp, 4.0 ) * t * ( 5 - t2 + 9 * eta2 + 4 * eta4 ) * pow( dr, 4.0 );
+	double x3 = -( 1.0 /   720.0 ) * n * pow( cp, 6.0 ) * t * ( -61 + 58 * t2 - t4 - 270 * eta2 + 330 * t2 * eta2 ) * pow( dr, 6.0 );
 	double x4 = -( 1.0 / 40320.0 ) * n * pow( cp, 8.0 ) * t * ( -1385 + 3111 * t2 - 543 * t4 + t6 ) * pow( dr, 8.0 );
 
 	XY->x = ( ( s - s0 ) + x1 + x2 + x3 + x4 ) * m0;
 
 	// Yを第4項まで計算する
-	double y1 =              n * cp * dr;
-	double y2 = -( 1.0 / 6.0 ) * n * pow( cp, 3.0 ) * ( -1 + t2 - eta2 ) * pow( dr, 3.0 );
-	double y3 = -( 1.0 / 120.0 ) * n * pow( cp, 5.0 ) * ( -5 + 18 * t2 - t4 - 14 * eta2 + 58 * t2 * eta2 ) * pow( dr, 5.0 );
+	double y1 =                     n *      cp *                                  dr;
+	double y2 = -( 1.0 /    6.0 ) * n * pow( cp, 3.0 ) * ( -1 + t2 - eta2 ) * pow( dr, 3.0 );
+	double y3 = -( 1.0 /  120.0 ) * n * pow( cp, 5.0 ) * ( -5 + 18 * t2 - t4 - 14 * eta2 + 58 * t2 * eta2 ) * pow( dr, 5.0 );
 	double y4 = -( 1.0 / 5040.0 ) * n * pow( cp, 7.0 ) * ( -61 + 479 * t2 - 179 * t4 + t6 ) * pow( dr, 7.0 );
 
 	XY->y = ( y1 + y2 + y3 + y4 ) * m0;
