@@ -3,7 +3,7 @@
 //  mgis
 //
 //  Created by naoki iimura on 3/16/10.
-//  Copyright 2010 __MyCompanyName__. All rights reserved.
+//  Copyright 2010 naoki iimura. All rights reserved.
 //
 
 #import "ContentsObject.h"
@@ -15,7 +15,7 @@
 
 /**
  Returns the support directory for the application, used to store the Core Data
- store file.  This code uses a directory named "CoreDataTest3" for
+ store file.  This code uses a directory named "M-GIS" for
  the content, either in the NSApplicationSupportDirectory location or (if the
  former cannot be found), the system's temporary directory.
  */
