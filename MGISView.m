@@ -9,10 +9,29 @@
 #import "MGISView.h"
 
 
+static int	RADIUS = 2;
+
 @implementation MGISView
 
 @synthesize center_x;
 @synthesize center_y;
+@synthesize zoomSlider;
+@synthesize mapFormat;
+@synthesize info_x;
+@synthesize info_y;
+@synthesize info_latitude;
+@synthesize info_longitude;
+@synthesize infoWindow;
+@synthesize scale;
+@synthesize first_draw;
+@synthesize dragging;
+@synthesize offscreenImage;
+@synthesize offscreenOrigin;
+@synthesize offscreenRect;
+@synthesize offscreenZoom;
+@synthesize offscreenMapSuffix;
+@synthesize map_folder;
+@synthesize map_suffix;
 
 // 初期化ルーチン
 - (id)initWithFrame:(NSRect)frame {
@@ -97,111 +116,185 @@
 	}
 	
 	if ( dragging ) {
-		x = scrollOrigin.x - [self bounds].size.width / 2.0 * meterPerPixel;
-		y = scrollOrigin.y - [self bounds].size.height / 2.0 * meterPerPixel;
+		x = offscreenOrigin.x - [self bounds].size.width / 2.0 * meterPerPixel;
+		y = offscreenOrigin.y - [self bounds].size.height / 2.0 * meterPerPixel;
 		x_offset = - ( x - floor( x / mapWidth ) * mapWidth ) / meterPerPixel;
 		y_offset = - ( y - floor( y / mapHeight ) * mapHeight ) / meterPerPixel;
-		x_offset += ( scrollOrigin.x - center_x ) / meterPerPixel;
-		y_offset += ( scrollOrigin.y - center_y ) / meterPerPixel;
+		x_offset += ( offscreenOrigin.x - center_x ) / meterPerPixel;
+		y_offset += ( offscreenOrigin.y - center_y ) / meterPerPixel;
 	} else {
-		// TODO:
-		//   新しく画像を作成しなくてもよいケースもあるので調整する
-		float offscreenWidth = mapImageWidth * ( floor( ( [self bounds].size.width - x_offset ) / mapImageWidth ) + 1 );
-		float offscreenHeight = mapImageHeight * ( floor( ( [self bounds].size.height - y_offset ) / mapImageHeight ) + 1 );
+		if ( zoom == offscreenZoom && [map_suffix compare:offscreenMapSuffix] == NSOrderedSame &&
+			 NSPointInRect( NSMakePoint(x,y), offscreenRect ) &&
+			 NSPointInRect( NSMakePoint( center_x + [self bounds].size.width / 2.0 * meterPerPixel,
+										 center_y + [self bounds].size.height / 2.0 * meterPerPixel ), offscreenRect ) ) {
 
-		// TODO:
-		//   たぶんメモリリークしている
-		//   offscreenImage が定義されていればリリースする?
-		offscreenImage = [[NSImage alloc] initWithSize:NSMakeSize( offscreenWidth, offscreenHeight )];
-		[offscreenImage lockFocus];
+			// 前に使用した画像がそのまま使える
+			x = offscreenOrigin.x - [self bounds].size.width / 2.0 * meterPerPixel;
+			y = offscreenOrigin.y - [self bounds].size.height / 2.0 * meterPerPixel;
+			x_offset = - ( x - floor( x / mapWidth ) * mapWidth ) / meterPerPixel;
+			y_offset = - ( y - floor( y / mapHeight ) * mapHeight ) / meterPerPixel;
+			x_offset += ( offscreenOrigin.x - center_x ) / meterPerPixel;
+			y_offset += ( offscreenOrigin.y - center_y ) / meterPerPixel;
+		} else {
+			// そのまま使うことができないので、新しく作成する
+			float offscreenWidth = mapImageWidth * ( floor( ( [self bounds].size.width - x_offset ) / mapImageWidth ) + 1 );
+			float offscreenHeight = mapImageHeight * ( floor( ( [self bounds].size.height - y_offset ) / mapImageHeight ) + 1 );
+			offscreenRect = NSMakeRect( x + x_offset * meterPerPixel,
+									    y + y_offset * meterPerPixel,
+									    offscreenWidth * meterPerPixel, offscreenHeight * meterPerPixel );
+			offscreenZoom = zoom;
+			offscreenOrigin = NSMakePoint( center_x, center_y );
+			offscreenMapSuffix = map_suffix;
 
-		float imageOffsetX = 0;
-		// オフセットが画面の一番上に逹っするまで繰り返す
-		while ( imageOffsetX < offscreenWidth ) {
-			// x は、画面の左下の座標(原点)の地図上の縦位置
-			// y_offset は、そこに表示すべき地図の、原点からのオフセット
-			float y = center_y - rect.size.height / 2.0 * meterPerPixel;
-			float imageOffsetY = 0;
+			// TODO:
+			//   たぶんメモリリークしている
+			//   offscreenImage が定義されていればリリースする?
+			offscreenImage = [[NSImage alloc] initWithSize:NSMakeSize( offscreenWidth, offscreenHeight )];
+			[offscreenImage lockFocus];
 
-			// オフセットが画面の一番右に逹っするまで繰り返す
-			while ( imageOffsetY < offscreenHeight ) {
-				// LARGE サイズのメッシュッコードを得る
-				// MIDDLE、DETAIL サイズについても、このコードを使う
-				NSString *meshString = [self getLargeMesh:NSMakePoint( x, y )];
+			float imageOffsetX = 0;
+			// オフセットが画面の一番上に逹っするまで繰り返す
+			while ( imageOffsetX < offscreenWidth ) {
+				// x は、画面の左下の座標(原点)の地図上の縦位置
+				// y_offset は、そこに表示すべき地図の、原点からのオフセット
+				float y = center_y - rect.size.height / 2.0 * meterPerPixel;
+				float imageOffsetY = 0;
 
-				NSString *mapFile;
-				switch (zoom) {
-					case ZoomLarge:
-					case ZoomLarge2:
-						// LARGE サイズの場合は、LARGE フォルダに「メッシュコード名.*」という形式で保存されている
-						mapFile = [map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"LARGE/%@%@%@",
-								   @"06", meshString, map_suffix]];
-						break;
-					case ZoomMiddle:
-					case ZoomMiddle2:
-						// MIDDLE サイズの場合は、MIDDLE フォルダの中に、そのメッシュを含む LARGE サイズの
-						// メッシュコード名のフォルダがあり、その中に保存されている
-					{
-						NSString *middleMeshString = [self getMiddleMesh:NSMakePoint( x, y )];
-						NSLog(@"Middle mesh: %@", middleMeshString);
-						NSLog(@"Path %@", [NSString stringWithFormat:@"MIDDLE/%@%@/%@%@%@%@", @"06", meshString, @"06", meshString, middleMeshString, map_suffix]);
-						mapFile = [map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"MIDDLE/%@%@/%@%@%@%@",
-								   @"06",meshString,@"06",meshString,middleMeshString,map_suffix]];
+				// オフセットが画面の一番右に逹っするまで繰り返す
+				while ( imageOffsetY < offscreenHeight ) {
+					// LARGE サイズのメッシュッコードを得る
+					// MIDDLE、DETAIL サイズについても、このコードを使う
+					NSString *meshString = [self getLargeMesh:NSMakePoint( x, y )];
+
+					NSString *mapFile;
+					switch (zoom) {
+						case ZoomLarge:
+						case ZoomLarge2:
+							// LARGE サイズの場合は、LARGE フォルダに「メッシュコード名.*」という形式で保存されている
+							mapFile = [map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"LARGE/%@%@%@",
+									   @"06", meshString, map_suffix]];
+							break;
+						case ZoomMiddle:
+						case ZoomMiddle2:
+							// MIDDLE サイズの場合は、MIDDLE フォルダの中に、そのメッシュを含む LARGE サイズの
+							// メッシュコード名のフォルダがあり、その中に保存されている
+						{
+							NSString *middleMeshString = [self getMiddleMesh:NSMakePoint( x, y )];
+							NSLog(@"Middle mesh: %@", middleMeshString);
+							NSLog(@"Path %@", [NSString stringWithFormat:@"MIDDLE/%@%@/%@%@%@%@", @"06", meshString, @"06", meshString, middleMeshString, map_suffix]);
+							mapFile = [map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"MIDDLE/%@%@/%@%@%@%@",
+									   @"06",meshString,@"06",meshString,middleMeshString,map_suffix]];
+						}
+							break;
+						case ZoomDetail:
+							// DETAIL サイズの場合は、DETAIL フォルダの中に、そのメッシュを含む LARGE サイズの
+							// メッシュコード名のフォルダがあり、その中に保存されている
+						{
+							NSString *detailMeshString = [self getDetailMesh:NSMakePoint( x, y )];
+							mapFile = [map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"DETAIL/%@%@/%@%@%@%@",
+									   @"06",meshString,@"06",meshString,detailMeshString,map_suffix]];
+						}
+							break;
+						default:
+							continue;
 					}
-						break;
-					case ZoomDetail:
-						// DETAIL サイズの場合は、DETAIL フォルダの中に、そのメッシュを含む LARGE サイズの
-						// メッシュコード名のフォルダがあり、その中に保存されている
-					{
-						NSString *detailMeshString = [self getDetailMesh:NSMakePoint( x, y )];
-						mapFile = [map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"DETAIL/%@%@/%@%@%@%@",
-								   @"06",meshString,@"06",meshString,detailMeshString,map_suffix]];
-					}
-						break;
-					default:
-						continue;
-				}
-				
-				NSLog(@"Map file: %@", mapFile);
-				NSLog(@"Offset: %.3f, %.3f", x_offset, y_offset);
+					
+					NSLog(@"Map file: %@", mapFile);
+					NSLog(@"Offset: %.3f, %.3f", x_offset, y_offset);
 
-				// 画像ファイルを得る
-				NSImage *anImage = [[NSImage alloc] initWithContentsOfFile:mapFile];
-				if ( anImage ) {
-					// NSImage が得られたら、計算しておいたオフセットの位置へ描画する
-//					[anImage compositeToPoint:NSMakePoint( imageOffsetX, imageOffsetY ) operation:NSCompositeSourceOver];
-					[anImage drawInRect:NSMakeRect( imageOffsetX, imageOffsetY, mapImageWidth, mapImageHeight )
-						       fromRect:NSMakeRect( 0, 0, MAP_IMAGE_WIDTH, MAP_IMAGE_HEIGHT )
-							  operation:NSCompositeSourceOver fraction:1.0];
-					[anImage release];
+					// 画像ファイルを得る
+					NSImage *anImage = [[NSImage alloc] initWithContentsOfFile:mapFile];
+					if ( anImage ) {
+						// NSImage が得られたら、計算しておいたオフセットの位置へ描画する
+	//					[anImage compositeToPoint:NSMakePoint( imageOffsetX, imageOffsetY ) operation:NSCompositeSourceOver];
+						[anImage drawInRect:NSMakeRect( imageOffsetX, imageOffsetY, mapImageWidth, mapImageHeight )
+								   fromRect:NSMakeRect( 0, 0, MAP_IMAGE_WIDTH, MAP_IMAGE_HEIGHT )
+								  operation:NSCompositeSourceOver fraction:1.0];
+						[anImage release];
+					}
+		//			[fileUrl release];
+					
+					// Y 方向の次のメッシュへ
+					y += mapImageHeight * meterPerPixel;
+					imageOffsetY += mapImageHeight;
 				}
-	//			[fileUrl release];
-				
-				// Y 方向の次のメッシュへ
-				y += mapImageHeight * meterPerPixel;
-				imageOffsetY += mapImageHeight;
+				// X 方向の次のメッシュへ
+				x += mapImageWidth * meterPerPixel;
+				imageOffsetX += mapImageWidth;
 			}
-			// X 方向の次のメッシュへ
-			x += mapImageWidth * meterPerPixel;
-			imageOffsetX += mapImageWidth;
+			[offscreenImage unlockFocus];
 		}
-		[offscreenImage unlockFocus];
 	}
 	[offscreenImage compositeToPoint:NSMakePoint( x_offset, y_offset ) operation:NSCompositeSourceOver];
 	
 	[self drawCenterMarker:(NSRect)rect];
+
+    NSBezierPath*	bezier = [NSBezierPath bezierPath];
+    
+    // Draw curve
+    [[NSColor blackColor] set];
+    [bezier moveToPoint:_startPoint];
+    [bezier curveToPoint:_endPoint controlPoint1:_ctrlPoint1 controlPoint2:_ctrlPoint2];
+    [bezier stroke];
+    
+    // Draw control points
+    [[[NSColor redColor] colorWithAlphaComponent:0.7] set];
+    [NSBezierPath fillRect:makeControlRect(_startPoint)];
+    [NSBezierPath fillRect:makeControlRect(_endPoint)];
+    [[NSBezierPath bezierPathWithOvalInRect:makeControlRect(_ctrlPoint1)] fill];
+    [[NSBezierPath bezierPathWithOvalInRect:makeControlRect(_ctrlPoint2)] fill];
+    [NSBezierPath strokeLineFromPoint:_startPoint toPoint:_ctrlPoint1];
+    [NSBezierPath strokeLineFromPoint:_endPoint toPoint:_ctrlPoint2];
 }
 
 // ビュー上でマウスボタンが押された際に呼ばれる
 // 地図をスクロールさせるための事前準備として、ボタンが押された座標を記録しておく
 - (void) mouseDown: (NSEvent *) event
 {
-	// マウスボタンが押された座標を記録しておく
-    grabOrigin = [event locationInWindow];
-	scrollOrigin = NSMakePoint( center_x, center_y );
-
-	// ドラッグ開始
-	dragging = YES;
+    NSPoint*	targetedPoint = NULL;
+    NSPoint		locationInWindow = [event locationInWindow];
+    
+    if(NSPointInRect(locationInWindow, makeControlRect(_startPoint))) {
+        targetedPoint = &_startPoint;
+    }
+    else if(NSPointInRect(locationInWindow, makeControlRect(_endPoint))) {
+        targetedPoint = &_endPoint;
+    }
+    else if(NSPointInRect(locationInWindow, makeControlRect(_ctrlPoint1))) {
+        targetedPoint = &_ctrlPoint1;
+    }
+    else if(NSPointInRect(locationInWindow, makeControlRect(_ctrlPoint2))) {
+        targetedPoint = &_ctrlPoint2;
+    }
+    
+    if(targetedPoint == NULL) {
+		// マウスボタンが押された座標を記録しておく
+		grabOrigin = [event locationInWindow];
+		scrollOrigin = NSMakePoint( center_x, center_y );
+		
+		// ドラッグ開始
+		dragging = YES;
+        return;
+    }
+    
+    // Track mouse dragging
+    while(1) {
+        NSEvent*	evt = [NSApp nextEventMatchingMask:(NSLeftMouseDraggedMask | NSLeftMouseUpMask) untilDate:nil inMode:NSEventTrackingRunLoopMode dequeue:YES];
+        
+        if([evt type] == NSLeftMouseUp) {
+            break;
+        }
+		if([evt type] == 0) {
+			continue;
+		}
+        
+        // Update targetedPoint
+        *targetedPoint = [evt locationInWindow];
+		NSLog(@"target: %f, %f, %d", targetedPoint->x, targetedPoint->y, [evt type ]);
+        
+        // Re-display itself
+        [self setNeedsDisplay:YES];
+    }
 } // mouseDown
 
 // ビュー上でドラッグされた際に呼ばれる
@@ -284,8 +377,6 @@
 }
 
 // 地図のズームレベルを変更した際に呼ばれる
-// TODO:
-//   操作時に地図の表示が一部乱れる
 - (IBAction) changeZoomLevel: (id)sender {
 	int prevZoom = zoom;
 	zoom = ZoomLarge2 - [zoomSlider intValue];
@@ -297,8 +388,6 @@
 }
 
 // 地図フォーマット切り替えボタンがクリックされたら、地図の拡張子を切り替える
-// TODO:
-//   変更されていなくても再描画されてしまうと思うので、なんとかしたい
 - (IBAction) changeMapFormat: (id)sender {
 	switch ([mapFormat selectedSegment]) {
 		case 0:
@@ -661,17 +750,19 @@
 	return pn;
 }
 
-@synthesize zoomSlider;
-@synthesize mapFormat;
-@synthesize info_x;
-@synthesize info_y;
-@synthesize info_latitude;
-@synthesize info_longitude;
-@synthesize infoWindow;
-@synthesize scale;
-@synthesize first_draw;
-@synthesize dragging;
-@synthesize offscreenImage;
-@synthesize map_folder;
-@synthesize map_suffix;
+- (void)awakeFromNib
+{
+    // Initialize
+    _startPoint.x = 50;		_startPoint.y = 100;
+    _endPoint.x = 200;		_endPoint.y = 100;
+    _ctrlPoint1.x = 100;	_ctrlPoint1.y = 150;
+    _ctrlPoint2.x = 150;	_ctrlPoint2.y = 150;
+}
+
+NSRect makeControlRect(NSPoint controlPoint)
+{
+    return NSMakeRect(controlPoint.x - RADIUS * 2, controlPoint.y - RADIUS * 2, RADIUS * 4, RADIUS * 4);
+}
+
+
 @end

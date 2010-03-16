@@ -12,6 +12,7 @@
 @implementation ContentsObject
 
 @synthesize window;
+@synthesize detailWindow;
 
 /**
  Returns the support directory for the application, used to store the Core Data
@@ -202,6 +203,7 @@
 - (void)dealloc {
 	
     [window release];
+	[detailWindow release];
     [managedObjectContext release];
     [persistentStoreCoordinator release];
     [managedObjectModel release];

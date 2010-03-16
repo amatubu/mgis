@@ -11,6 +11,7 @@
 
 @interface ContentsObject : NSObject {
     NSWindow *window;
+	NSWindow *detailWindow;
     
     NSPersistentStoreCoordinator *persistentStoreCoordinator;
     NSManagedObjectModel *managedObjectModel;
@@ -18,6 +19,7 @@
 }
 
 @property (nonatomic, retain) IBOutlet NSWindow *window;
+@property (nonatomic, retain) IBOutlet NSWindow *detailWindow;
 
 @property (nonatomic, retain, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 @property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;

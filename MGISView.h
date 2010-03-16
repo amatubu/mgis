@@ -52,11 +52,21 @@ typedef enum {
     NSPoint grabOrigin;
     NSPoint scrollOrigin;
 	NSImage *offscreenImage;
+	NSPoint offscreenOrigin;
+	NSRect offscreenRect;
+	ZoomLevel offscreenZoom;
+	NSString *offscreenMapSuffix;
 
 	ZoomLevel zoom;
 
 	NSString *map_folder;
 	NSString *map_suffix;
+
+	// for content test
+    NSPoint	_startPoint;
+    NSPoint	_endPoint;
+    NSPoint	_ctrlPoint1;
+    NSPoint	_ctrlPoint2;
 }
 
 - (void) setupDefaults;
@@ -95,6 +105,12 @@ typedef enum {
 @property BOOL first_draw;
 @property BOOL dragging;
 @property (retain) NSImage *offscreenImage;
+@property NSPoint offscreenOrigin;
+@property NSRect offscreenRect;
+@property ZoomLevel offscreenZoom;
+@property (retain) NSString *offscreenMapSuffix;
 @property (retain) NSString *map_folder;
 @property (retain) NSString *map_suffix;
 @end
+
+NSRect makeControlRect(NSPoint controlPoint);
