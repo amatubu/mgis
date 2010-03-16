@@ -59,9 +59,6 @@ typedef enum {
 	NSString *map_suffix;
 }
 
-@property float center_x;
-@property float center_y;
-
 - (void) setupDefaults;
 
 - (void) getFirstMesh:(char *)first x:(int)x_ind y:(int)y_ind;
@@ -85,4 +82,19 @@ typedef enum {
 - (IBAction) changeZoomLevel:(id)sender;
 - (IBAction) changeMapFormat:(id)sender;
 
+@property float center_x;
+@property float center_y;
+@property (retain) id zoomSlider;
+@property (retain) id mapFormat;
+@property (retain) id info_x;
+@property (retain) id info_y;
+@property (retain) id info_latitude;
+@property (retain) id info_longitude;
+@property (retain) id infoWindow;
+@property (retain) id scale;
+@property BOOL first_draw;
+@property BOOL dragging;
+@property (retain) NSImage *offscreenImage;
+@property (retain) NSString *map_folder;
+@property (retain) NSString *map_suffix;
 @end

@@ -19,11 +19,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         // 地図の画像ファイルが保存されているパス
-		// TODO:
-		//   任意の場所を指定できるようにする
-		//   iPhone では、どこにするか?
-//		map_folder = @"/Users/sent/work/mgis/200403/";
-//		map_folder = [[contentsObject applicationSupportDirectory] stringByAppendingFormat:@"/map/200403/"];
+//		map_folder = @"/Users/sent/Library/Application Data/M-GIS/map/200403/";
 		NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
 		NSString *basePath = ([paths count] > 0 ) ? [paths objectAtIndex:0] : NSTemporaryDirectory();
 		map_folder = [[basePath stringByAppendingPathComponent:@"M-GIS/map/200403/"] retain];
@@ -665,4 +661,17 @@
 	return pn;
 }
 
+@synthesize zoomSlider;
+@synthesize mapFormat;
+@synthesize info_x;
+@synthesize info_y;
+@synthesize info_latitude;
+@synthesize info_longitude;
+@synthesize infoWindow;
+@synthesize scale;
+@synthesize first_draw;
+@synthesize dragging;
+@synthesize offscreenImage;
+@synthesize map_folder;
+@synthesize map_suffix;
 @end
