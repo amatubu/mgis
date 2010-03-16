@@ -22,7 +22,11 @@
 		// TODO:
 		//   任意の場所を指定できるようにする
 		//   iPhone では、どこにするか?
-		map_folder = @"/Users/sent/work/mgis/200403/";
+//		map_folder = @"/Users/sent/work/mgis/200403/";
+//		map_folder = [[contentsObject applicationSupportDirectory] stringByAppendingFormat:@"/map/200403/"];
+		NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+		NSString *basePath = ([paths count] > 0 ) ? [paths objectAtIndex:0] : NSTemporaryDirectory();
+		map_folder = [[basePath stringByAppendingPathComponent:@"M-GIS/map/200403/"] retain];
 
 		// 画面の中心の座標の初期値
 		// 直交座標系 VI 系
@@ -134,8 +138,8 @@
 					case ZoomLarge:
 					case ZoomLarge2:
 						// LARGE サイズの場合は、LARGE フォルダに「メッシュコード名.*」という形式で保存されている
-						mapFile = [NSString stringWithFormat:@"%@LARGE/%@%@%@",
-								   map_folder, @"06", meshString, map_suffix];
+						mapFile = [map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"LARGE/%@%@%@",
+								   @"06", meshString, map_suffix]];
 						break;
 					case ZoomMiddle:
 					case ZoomMiddle2:
@@ -143,8 +147,10 @@
 						// メッシュコード名のフォルダがあり、その中に保存されている
 					{
 						NSString *middleMeshString = [self getMiddleMesh:NSMakePoint( x, y )];
-						mapFile = [NSString stringWithFormat:@"%@MIDDLE/%@%@/%@%@%@%@",
-								   map_folder,@"06",meshString,@"06",meshString,middleMeshString,map_suffix];
+						NSLog(@"Middle mesh: %@", middleMeshString);
+						NSLog(@"Path %@", [NSString stringWithFormat:@"MIDDLE/%@%@/%@%@%@%@", @"06", meshString, @"06", meshString, middleMeshString, map_suffix]);
+						mapFile = [map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"MIDDLE/%@%@/%@%@%@%@",
+								   @"06",meshString,@"06",meshString,middleMeshString,map_suffix]];
 					}
 						break;
 					case ZoomDetail:
@@ -152,8 +158,8 @@
 						// メッシュコード名のフォルダがあり、その中に保存されている
 					{
 						NSString *detailMeshString = [self getDetailMesh:NSMakePoint( x, y )];
-						mapFile = [NSString stringWithFormat:@"%@DETAIL/%@%@/%@%@%@%@",
-								   map_folder,@"06",meshString,@"06",meshString,detailMeshString,map_suffix];
+						mapFile = [map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"DETAIL/%@%@/%@%@%@%@",
+								   @"06",meshString,@"06",meshString,detailMeshString,map_suffix]];
 					}
 						break;
 					default:
@@ -419,14 +425,10 @@
 	float mapWidth = LARGE_MAP_WIDTH;
 	switch (zoom) {
 		case ZoomLarge:
-			mapWidth = LARGE_MAP_WIDTH;
-			break;
 		case ZoomLarge2:
 			mapWidth = LARGE_MAP_WIDTH;
 			break;
 		case ZoomMiddle:
-			mapWidth = MIDDLE_MAP_WIDTH;
-			break;
 		case ZoomMiddle2:
 			mapWidth = MIDDLE_MAP_WIDTH;
 			break;
@@ -444,14 +446,10 @@
 	float mapHeight = LARGE_MAP_HEIGHT;
 	switch (zoom) {
 		case ZoomLarge:
-			mapHeight = LARGE_MAP_HEIGHT;
-			break;
 		case ZoomLarge2:
 			mapHeight = LARGE_MAP_HEIGHT;
 			break;
 		case ZoomMiddle:
-			mapHeight = MIDDLE_MAP_HEIGHT;
-			break;
 		case ZoomMiddle2:
 			mapHeight = MIDDLE_MAP_HEIGHT;
 			break;
