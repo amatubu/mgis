@@ -46,16 +46,24 @@ typedef enum {
 	float center_x;
 	float center_y;
 
+	BOOL first_draw;
+
+	BOOL dragging;
     NSPoint grabOrigin;
     NSPoint scrollOrigin;
+	NSImage *offscreenImage;
 
 	ZoomLevel zoom;
-	NSImage *offscreenImage;
-	BOOL dragging;
 
 	NSString *map_folder;
 	NSString *map_suffix;
 }
+
+@property float center_x;
+@property float center_y;
+
+- (void) setupDefaults;
+
 - (void) getFirstMesh:(char *)first x:(int)x_ind y:(int)y_ind;
 - (void) getTenthMesh:(char *)second x:(int)x_ind y:(int)y_ind;
 - (void) getFifthMesh:(char *)middle x:(int)x_ind y:(int)y_ind;
@@ -68,7 +76,11 @@ typedef enum {
 - (void) updateInfoWindow;
 - (void) updateScaleText;
 - (void) drawCenterMarker: (NSRect)viewRect;
-- (void) getLongLatFromXY:(NSPoint)XY latitude:(float *)latitude longitude:(float *)longitude;
+
+- (void) getLatLongFromXY:(NSPoint)XY latitude:(double *)latitude longitude:(double *)longitude;
+- (void) getXYFromLatitude: (double)latitude longitude:(double)longitude xy:(NSPoint *)XY;
+- (double) calcMeridianLengthFromLatitude: (double)p a:(double)a e2:(double)e2;
+- (double) calcLatitudeFromY: (double)y p0:(double)p0 a:(double)a e2:(double)e2;
 
 - (IBAction) changeZoomLevel:(id)sender;
 - (IBAction) changeMapFormat:(id)sender;
