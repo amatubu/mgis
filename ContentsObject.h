@@ -25,6 +25,8 @@
 @property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, retain, readonly) NSManagedObjectContext *managedObjectContext;
 
-- (IBAction)saveAction:sender;
+- (IBAction) saveAction:sender;
+- (IBAction) showListWindow:(id)sender;
+- (IBAction) showDetailWindow:(id)sender;
 
 @end

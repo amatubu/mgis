@@ -7,6 +7,7 @@
 //
 
 #import <AppKit/NSView.h>
+#import "CoordinateConverter.h"
 
 typedef enum {
     ZoomDetail = 0,
@@ -62,6 +63,8 @@ typedef enum {
 	NSString *map_folder;
 	NSString *map_suffix;
 
+	CoordinateConverter *converter;
+	
 	// for content test
     NSPoint	_startPoint;
     NSPoint	_endPoint;
@@ -83,11 +86,6 @@ typedef enum {
 - (void) updateInfoWindow;
 - (void) updateScaleText;
 - (void) drawCenterMarker: (NSRect)viewRect;
-
-- (void) getLatLongFromXY:(NSPoint)XY latitude:(double *)latitude longitude:(double *)longitude;
-- (void) getXYFromLatitude: (double)latitude longitude:(double)longitude xy:(NSPoint *)XY;
-- (double) calcMeridianLengthFromLatitude: (double)p a:(double)a e2:(double)e2;
-- (double) calcLatitudeFromY: (double)y p0:(double)p0 a:(double)a e2:(double)e2;
 
 - (IBAction) changeZoomLevel:(id)sender;
 - (IBAction) changeMapFormat:(id)sender;
@@ -111,6 +109,8 @@ typedef enum {
 @property (retain) NSString *offscreenMapSuffix;
 @property (retain) NSString *map_folder;
 @property (retain) NSString *map_suffix;
+
+@property (retain) CoordinateConverter *converter;
 @end
 
 NSRect makeControlRect(NSPoint controlPoint);

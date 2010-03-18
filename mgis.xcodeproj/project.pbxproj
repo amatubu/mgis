@@ -12,6 +12,7 @@
 		2F4D5E6B114F4B0B00F92604 /* ContentsObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F4D5E6A114F4B0B00F92604 /* ContentsObject.m */; };
 		2F647287114EEDC60030B47A /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2F647286114EEDC60030B47A /* UserDefaults.plist */; };
 		2F76F56F1148F20200CDBF71 /* MGISView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F76F56E1148F20200CDBF71 /* MGISView.m */; };
+		2FD4181211523B2C004238C9 /* CoordinateConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FD4181111523B2C004238C9 /* CoordinateConverter.m */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -31,6 +32,8 @@
 		2F647286114EEDC60030B47A /* UserDefaults.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = UserDefaults.plist; sourceTree = "<group>"; };
 		2F76F56D1148F20200CDBF71 /* MGISView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGISView.h; sourceTree = "<group>"; };
 		2F76F56E1148F20200CDBF71 /* MGISView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGISView.m; sourceTree = "<group>"; };
+		2FD4181011523B2C004238C9 /* CoordinateConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoordinateConverter.h; sourceTree = "<group>"; };
+		2FD4181111523B2C004238C9 /* CoordinateConverter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoordinateConverter.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* mgis_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mgis_Prefix.pch; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* mgis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mgis.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -55,6 +58,8 @@
 				2F76F56E1148F20200CDBF71 /* MGISView.m */,
 				2F4D5E69114F4B0B00F92604 /* ContentsObject.h */,
 				2F4D5E6A114F4B0B00F92604 /* ContentsObject.m */,
+				2FD4181011523B2C004238C9 /* CoordinateConverter.h */,
+				2FD4181111523B2C004238C9 /* CoordinateConverter.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -195,6 +200,7 @@
 				2F76F56F1148F20200CDBF71 /* MGISView.m in Sources */,
 				2F4D5E0C114F3C9600F92604 /* mgis.xcdatamodel in Sources */,
 				2F4D5E6B114F4B0B00F92604 /* ContentsObject.m in Sources */,
+				2FD4181211523B2C004238C9 /* CoordinateConverter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

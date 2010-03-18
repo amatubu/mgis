@@ -141,6 +141,14 @@
     }
 }
 
+- (IBAction) showListWindow:(id)sender {
+	[window makeKeyAndOrderFront:self];
+}
+
+- (IBAction) showDetailWindow:(id)sender {
+	[detailWindow makeKeyAndOrderFront:self];
+}
+
 
 /**
  Implementation of the applicationShouldTerminate: method, used here to
