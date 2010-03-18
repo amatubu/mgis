@@ -108,6 +108,30 @@ static int	RADIUS = 2;
 		[self updateScaleText];
 		first_draw = NO;
 	}
+
+	// コンテクストを得る
+	NSManagedObjectContext *context = [contentObject managedObjectContext];
+	
+	// 検索条件
+	// BOOL 値は、「= NO」で比較できるようだ
+	// リレーションについても、リレーション名.アトリビュート名で指定できる
+//	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = 'name1'"];
+	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"hidden = NO and layer.hidden = NO"];
+
+	// 検索対象のエンティティ
+	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Contents" inManagedObjectContext:context];
+	
+	// リクエストを新規作成し、検索対象と検索条件を設定
+	NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+	[request setEntity:entity];
+	[request setPredicate:predicate];
+
+	// 取り出す最大数
+	[request setFetchLimit: 10];
+	
+	// フェッチ
+	NSError *error;
+	NSArray *fetchedObjects = [context executeFetchRequest:request error: &error ];
 	
 	// ズームレベルによって異なる定数を変数に保存しておく
 	float meterPerPixel = [self getMeterPerPixel];
@@ -143,6 +167,8 @@ static int	RADIUS = 2;
 										 center_y + [self bounds].size.height / 2.0 * meterPerPixel ), offscreenRect ) ) {
 
 			// 前に使用した画像がそのまま使える
+			// TODO:
+			//   ウィンドウの大きさを変更した際に地図がずれる場合がある
 			x = offscreenOrigin.x - [self bounds].size.width / 2.0 * meterPerPixel;
 			y = offscreenOrigin.y - [self bounds].size.height / 2.0 * meterPerPixel;
 			x_offset = - ( x - floor( x / mapWidth ) * mapWidth ) / meterPerPixel;

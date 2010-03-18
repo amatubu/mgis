@@ -43,6 +43,7 @@ typedef enum {
 	IBOutlet id info_longitude;
 	IBOutlet id infoWindow;
 	IBOutlet id scale;
+	IBOutlet id contentObject;
 	
 	float center_x;
 	float center_y;
