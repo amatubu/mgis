@@ -13,6 +13,7 @@
 
 @synthesize window;
 @synthesize detailWindow;
+@synthesize mgisView;
 
 /**
  Returns the support directory for the application, used to store the Core Data
@@ -149,6 +150,29 @@
 	[detailWindow makeKeyAndOrderFront:self];
 }
 
+- (IBAction) importContents:(id)sender {
+	NSLog( @"importContents %@", sender );
+}
+
+- (IBAction) exportContents:(id)sender {
+	NSLog( @"exportContents %@", sender );
+}
+
+- (IBAction) createPointContent:(id)sender {
+	NSLog( @"createPointContent %@", sender );
+}
+
+- (IBAction) createPolylineContent:(id)sender {
+	NSLog( @"createPolylineContent %@", sender );
+}
+
+- (IBAction) createPolygonContent:(id)sender {
+	NSLog( @"createPolygonContent %@", sender );
+}
+
+- (IBAction) createTextContent:(id)sender {
+	NSLog( @"createTextContent %@", sender );
+}
 
 /**
  Implementation of the applicationShouldTerminate: method, used here to
