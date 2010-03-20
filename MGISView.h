@@ -53,6 +53,7 @@ typedef enum {
 	BOOL dragging;
     NSPoint grabOrigin;
     NSPoint scrollOrigin;
+
 	NSImage *offscreenImage;
 	NSPoint offscreenOrigin;
 	NSRect offscreenRect;
@@ -87,6 +88,7 @@ typedef enum {
 - (void) updateInfoWindow;
 - (void) updateScaleText;
 - (void) drawCenterMarker: (NSRect)viewRect;
+- (void) updateOffscreenImageAtOrigin:(NSPoint)origin size:(NSSize)size;
 
 - (IBAction) changeZoomLevel:(id)sender;
 - (IBAction) changeMapFormat:(id)sender;

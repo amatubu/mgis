@@ -8,6 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
+// 円周率
+#define PI 3.14159265358979323846
+// 原点における縮尺係数
+#define m0 0.9999
+// ラジアン / 度
+#define rd ( PI / 180 )
+
+
 @interface CoordinateConverter : NSObject {
 	double a;
     double f;

@@ -9,11 +9,6 @@
 #import "CoordinateConverter.h"
 
 
-// 円周率
-double PI = 3.14159265358979323846;
-// 原点における縮尺係数
-double m0 = 0.9999;
-
 @implementation CoordinateConverter
 
 @synthesize a;
@@ -53,8 +48,6 @@ double m0 = 0.9999;
 - (void) getLatLongFromXY:(NSPoint)XY latitude:(double *)latitude longitude:(double *)longitude kei:(int)kei
 {
 	// 原点の座標
-	// ラジアン / 度
-	double rd = PI / 180;
     double p0;
     double r0;
     [self getLangLotOfOriginFromKei:kei latitude:&p0 longitude:&r0];
@@ -97,8 +90,6 @@ double m0 = 0.9999;
 // 緯度・経度から平面直角座標系の座標に変換する
 - (void) getXYFromLatitude: (double)latitude longitude:(double)longitude xy:(NSPoint *)XY kei:(int)kei
 {
-	// ラジアン / 度
-	double rd = PI / 180;
 	// ラジアンに変換する
 	double p = latitude * rd;
 	double r = longitude * rd;
@@ -209,7 +200,6 @@ double m0 = 0.9999;
 - (double) calcLatitudeFromY: (double)y p0:(double)p0
 {
 	double s0 = [self calcMeridianLengthFromLatitude:p0];
-	double m0 = 0.9999;
 	double m = s0 + y / m0;
 
 	double pn = p0;
