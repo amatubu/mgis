@@ -44,6 +44,7 @@ typedef enum {
 	IBOutlet id infoWindow;
 	IBOutlet id scale;
 	IBOutlet id contentObject;
+    IBOutlet id userPrefs;
 	
 	float center_x;
 	float center_y;

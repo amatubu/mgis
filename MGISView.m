@@ -611,6 +611,19 @@ static int	RADIUS = 2;
     _endPoint.x = 200;		_endPoint.y = 100;
     _ctrlPoint1.x = 100;	_ctrlPoint1.y = 150;
     _ctrlPoint2.x = 150;	_ctrlPoint2.y = 150;
+
+    NSNumber *temp = [[userPrefs values] valueForKey:@"center_x"];
+    if ( temp ) {
+        self.center_x = [temp floatValue];
+    }
+    temp = [[userPrefs values] valueForKey:@"center_y"];
+    if ( temp ) {
+        self.center_y = [temp floatValue];
+    }
+    temp = [[NSNumber numberWithFloat:self.center_x] autorelease];
+    [[userPrefs values] setValue:temp forKey:@"center_x"];
+    temp = [[NSNumber numberWithFloat:self.center_y] autorelease];
+    [[userPrefs values] setValue:temp forKey:@"center_y"];
 }
 
 NSRect makeControlRect(NSPoint controlPoint)
