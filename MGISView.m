@@ -138,7 +138,11 @@ static int	RADIUS = 4;
 	
 	// フェッチ
 	NSError *error;
-	NSArray *fetchedObjects = [context executeFetchRequest:request error: &error];
+	NSArray *fetchedObjects = [context executeFetchRequest:request error:&error];
+//    for ( NSInteger index = 0; index < [fetchedObjects count]; index++ ) {
+//        NSNumber *layer = [[fetchedObjects objectAtIndex:index] valueForKey:@"layer"];
+//        NSLog( @"layer %@", layer );
+//    }
 	
 	// ズームレベルによって異なる定数を変数に保存しておく
 	float meterPerPixel = [self getMeterPerPixel];
@@ -255,9 +259,27 @@ static int	RADIUS = 4;
                                                insertIntoManagedObjectContext:context];
             // TODO:
             //   値を設定しようとすると失敗する
-            //[object setValue:aPolyline forKey:@"shape"];
+            NSError *error;
+            if ( [object validateValue:&aPolyline forKey:@"shape" error:&error] ) {
+                //[object setValue:aPolyline forKey:@"shape"];
+            } else {
+                NSLog( @"Error %@ returned from validateValue:forKey:error", error );
+            }
+
+            // レイヤーの設定をする
             // TODO:
-            //   レイヤーの設定ができていない
+            //   とりあえず適当なレイヤーを得る
+            //   レイヤーが存在しなかった場合のエラー処理
+            NSEntityDescription *layerEntity = [NSEntityDescription entityForName:@"Layers"
+                                                           inManagedObjectContext:context];
+            NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+            [request setEntity:layerEntity];
+            [request setFetchLimit:1];
+            NSArray *layerObjects = [context executeFetchRequest:request error:nil];
+            NSManagedObject *layerObject = [layerObjects objectAtIndex:0];
+            [object setValue:layerObject forKey:@"layer"];
+            
+            // 作成したオブジェクトを追加する
             [context insertObject:object];
             
             // 作成中ポリラインを破棄し、地図モードに戻る
@@ -265,8 +287,12 @@ static int	RADIUS = 4;
             creatingPolyline = nil;
             self.editingMode = ModeViewingMap;
             
+            // ビューを更新させる必要がある
+            [self setNeedsDisplay:YES];
+            
             // 詳細ウィンドウを表示する
-            // その前に、追加したデータを選択してやる必要がある
+            // TODO:
+            //   その前に、追加したデータを選択してやる必要がある
             [contentObject showDetailWindow:nil];
             return;
         }
