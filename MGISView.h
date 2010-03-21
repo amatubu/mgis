@@ -50,15 +50,19 @@ typedef enum {
 @interface MGISView : NSView {
 	IBOutlet id zoomSlider;
 	IBOutlet id mapFormat;
-	IBOutlet id info_x;
-	IBOutlet id info_y;
-	IBOutlet id info_latitude;
-	IBOutlet id info_longitude;
-	IBOutlet id infoWindow;
 	IBOutlet id scale;
 	IBOutlet id contentObject;
     IBOutlet id userPrefs;
 	
+	IBOutlet id infoWindow;
+	IBOutlet id info_x;
+	IBOutlet id info_y;
+	IBOutlet id info_latitude;
+	IBOutlet id info_longitude;
+
+    IBOutlet id lineWidth;
+    IBOutlet id lineColor;
+    
 	float center_x;
 	float center_y;
 
@@ -108,6 +112,8 @@ typedef enum {
 
 - (IBAction) changeZoomLevel:(id)sender;
 - (IBAction) changeMapFormat:(id)sender;
+- (IBAction) changeLineWidth:(id)sender;
+- (IBAction) changeLineColor:(id)sender;
 
 @property float center_x;
 @property float center_y;

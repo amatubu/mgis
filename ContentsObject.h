@@ -14,6 +14,7 @@
 	MGISView *mgisView;
     NSWindow *window;
 	NSWindow *detailWindow;
+    NSPanel *shapeParamPanel;
     
     NSPersistentStoreCoordinator *persistentStoreCoordinator;
     NSManagedObjectModel *managedObjectModel;
@@ -23,6 +24,7 @@
 @property (nonatomic, retain) IBOutlet NSWindow *window;
 @property (nonatomic, retain) IBOutlet NSWindow *detailWindow;
 @property (nonatomic, retain) IBOutlet MGISView *mgisView;
+@property (nonatomic, retain) IBOutlet NSPanel *shapeParamPanel;
 
 @property (nonatomic, retain, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 @property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;
@@ -39,5 +41,7 @@
 - (IBAction) createPolylineContent:(id)sender;
 - (IBAction) createPolygonContent:(id)sender;
 - (IBAction) createTextContent:(id)sernder;
+
+- (void) insertPolylineContent:(NSValue *)aPolyline;
 
 @end

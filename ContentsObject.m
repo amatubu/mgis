@@ -14,6 +14,7 @@
 @synthesize window;
 @synthesize detailWindow;
 @synthesize mgisView;
+@synthesize shapeParamPanel;
 
 /**
  Returns the support directory for the application, used to store the Core Data
@@ -165,6 +166,7 @@
 - (IBAction) createPolylineContent:(id)sender {
 	NSLog( @"createPolylineContent %@", sender );
     mgisView.editingMode = ModeCreatePolyline;
+    [shapeParamPanel makeKeyAndOrderFront:self];
 }
 
 - (IBAction) createPolygonContent:(id)sender {
@@ -173,6 +175,48 @@
 
 - (IBAction) createTextContent:(id)sender {
 	NSLog( @"createTextContent %@", sender );
+}
+
+// ポリラインを追加する
+- (void) insertPolylineContent:(NSValue *)aPolyline {
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Contents"                                       inManagedObjectContext:context];
+    //            NSManagedObject *object = [NSEntityDescription insertNewObjectForEntityForName:@"Contents"
+    //                                                                    inManagedObjectContext:context];
+    NSManagedObject *object = [[NSManagedObject alloc] initWithEntity:entity
+                                       insertIntoManagedObjectContext:context];
+    // TODO:
+    //   値を設定しようとすると失敗する
+    NSError *error;
+    if ( [object validateValue:&aPolyline forKey:@"shape" error:&error] ) {
+        //[object setValue:aPolyline forKey:@"shape"];
+    } else {
+        NSLog( @"Error %@ returned from validateValue:forKey:error", error );
+    }
+    
+    // レイヤーの設定をする
+    // TODO:
+    //   とりあえず適当なレイヤーを得る
+    //   レイヤーが存在しなかった場合のエラー処理
+    NSEntityDescription *layerEntity = [NSEntityDescription entityForName:@"Layers"
+                                                   inManagedObjectContext:context];
+    NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+    [request setEntity:layerEntity];
+    [request setFetchLimit:1];
+    NSArray *layerObjects = [context executeFetchRequest:request error:nil];
+    NSManagedObject *layerObject = [layerObjects objectAtIndex:0];
+    [object setValue:layerObject forKey:@"layer"];
+    
+    // 作成したオブジェクトを追加する
+    [context insertObject:object];
+    
+    // 設定パネルを閉じる
+    [self.shapeParamPanel orderOut:self];
+    
+    // 詳細ウィンドウをアクティブに
+    // TODO:
+    //   その前に、追加したデータを選択してやる必要がある
+    [self.detailWindow makeKeyAndOrderFront:self];
 }
 
 /**

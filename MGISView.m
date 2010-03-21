@@ -122,13 +122,16 @@ static int	RADIUS = 4;
 	// 検索条件
 	// BOOL 値は、「= NO」で比較できるようだ
 	// リレーションについても、リレーション名.アトリビュート名で指定できる
-//	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = 'name1'"];
+//	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = 'name'"];
+    //   途中で Layers の hidden を有効にしても、保存するまで抽出条件に反映されない
+    //   Contents の hidden を有効にした場合は即座に反映される
 	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"hidden = NO and layer.hidden = NO"];
 
 	// 検索対象のエンティティ
-	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Contents" inManagedObjectContext:context];
+	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Contents"
+                                              inManagedObjectContext:context];
 	
-	// リクエストを新規作成し、検索対象と検索条件を設定
+	// リクエストを新規作成し、検索対象と検索条件を設定
 	NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
 	[request setEntity:entity];
 	[request setPredicate:predicate];
@@ -139,10 +142,14 @@ static int	RADIUS = 4;
 	// フェッチ
 	NSError *error;
 	NSArray *fetchedObjects = [context executeFetchRequest:request error:&error];
-//    for ( NSInteger index = 0; index < [fetchedObjects count]; index++ ) {
-//        NSNumber *layer = [[fetchedObjects objectAtIndex:index] valueForKey:@"layer"];
-//        NSLog( @"layer %@", layer );
-//    }
+    NSLog( @"Number of visible contents: %d", [fetchedObjects count] );
+    /*
+    for ( NSInteger index = 0; index < [fetchedObjects count]; index++ ) {
+        NSNumber *layer = [[fetchedObjects objectAtIndex:index] valueForKey:@"layer"];
+        NSLog( @"layer %@", layer );
+        NSString *name = [[fetchedObjects objectAtIndex:index] valueForKey:@"name"];
+        NSLog( @"name %@", name );
+    }*/
 	
 	// ズームレベルによって異なる定数を変数に保存しておく
 	float meterPerPixel = [self getMeterPerPixel];
@@ -251,36 +258,7 @@ static int	RADIUS = 4;
         if ( self.editingMode == ModeCreatingPolyline ) {
             // ポリラインを確定させる
             NSValue *aPolyline = [NSValue valueWithBytes:&creatingPolyline objCType:@encode(MGISPolyline)];
-            NSManagedObjectContext *context = [contentObject managedObjectContext];
-            NSEntityDescription *entity = [NSEntityDescription entityForName:@"Contents" inManagedObjectContext:context];
-//            NSManagedObject *object = [NSEntityDescription insertNewObjectForEntityForName:@"Contents"
-//                                                                    inManagedObjectContext:context];
-            NSManagedObject *object = [[NSManagedObject alloc] initWithEntity:entity
-                                               insertIntoManagedObjectContext:context];
-            // TODO:
-            //   値を設定しようとすると失敗する
-            NSError *error;
-            if ( [object validateValue:&aPolyline forKey:@"shape" error:&error] ) {
-                //[object setValue:aPolyline forKey:@"shape"];
-            } else {
-                NSLog( @"Error %@ returned from validateValue:forKey:error", error );
-            }
-
-            // レイヤーの設定をする
-            // TODO:
-            //   とりあえず適当なレイヤーを得る
-            //   レイヤーが存在しなかった場合のエラー処理
-            NSEntityDescription *layerEntity = [NSEntityDescription entityForName:@"Layers"
-                                                           inManagedObjectContext:context];
-            NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
-            [request setEntity:layerEntity];
-            [request setFetchLimit:1];
-            NSArray *layerObjects = [context executeFetchRequest:request error:nil];
-            NSManagedObject *layerObject = [layerObjects objectAtIndex:0];
-            [object setValue:layerObject forKey:@"layer"];
-            
-            // 作成したオブジェクトを追加する
-            [context insertObject:object];
+            [contentObject insertPolylineContent:aPolyline];
             
             // 作成中ポリラインを破棄し、地図モードに戻る
             [creatingPolyline release];
@@ -289,11 +267,6 @@ static int	RADIUS = 4;
             
             // ビューを更新させる必要がある
             [self setNeedsDisplay:YES];
-            
-            // 詳細ウィンドウを表示する
-            // TODO:
-            //   その前に、追加したデータを選択してやる必要がある
-            [contentObject showDetailWindow:nil];
             return;
         }
     }
@@ -566,6 +539,22 @@ static int	RADIUS = 4;
 	[self setNeedsDisplay:YES];
 }
 
+- (IBAction) changeLineWidth: (id)sender {
+    float width = [lineWidth intValue];
+    if ( self.editingMode == ModeCreatePolyline || self.editingMode == ModeCreatingPolyline ) {
+        creatingPolyline.lineWidth = width;
+        [self setNeedsDisplay:YES];
+    }
+}
+
+- (IBAction) changeLineColor: (id)sender {
+    NSColor *color = [lineColor color];
+    if ( self.editingMode == ModeCreatePolyline || self.editingMode == ModeCreatingPolyline ) {
+        creatingPolyline.lineColor = color;
+        [self setNeedsDisplay:YES];
+    }
+}
+
 // すべてのもととなるメッシュのコードを得る
 // 6桁目までで、ひとつのメッシュの縦横が 3km × 4km
 // LARGE サイズを縦横 10 枚つなげたもの
@@ -710,6 +699,8 @@ static int	RADIUS = 4;
 	return mapHeight;
 }
 
+// Nib ファイルから読み込まれたときに呼ばれる
+// 各種初期化
 - (void)awakeFromNib
 {
     // Initialize
@@ -718,6 +709,7 @@ static int	RADIUS = 4;
     _ctrlPoint1.x = 100;	_ctrlPoint1.y = 150;
     _ctrlPoint2.x = 150;	_ctrlPoint2.y = 150;
 
+    // 設定ファイルから中心位置を読み込む
     NSNumber *temp = [[userPrefs values] valueForKey:@"center_x"];
     if ( temp ) {
         self.center_x = [temp floatValue];
@@ -726,12 +718,17 @@ static int	RADIUS = 4;
     if ( temp ) {
         self.center_y = [temp floatValue];
     }
+
+    // 中心位置を設定ファイルに書き込む
+    // TODO:
+    //   ビューが閉じられる前に保存すべき
     temp = [NSNumber numberWithFloat:self.center_x];
     [[userPrefs values] setValue:temp forKey:@"center_x"];
-//    [temp release];
     temp = [NSNumber numberWithFloat:self.center_y];
     [[userPrefs values] setValue:temp forKey:@"center_y"];
-//    [temp release];
+    
+    // ウィンドウをアクティブにする
+    [[self window] makeKeyAndOrderFront:self];
 }
 
 NSRect makeControlRect(NSPoint controlPoint)
