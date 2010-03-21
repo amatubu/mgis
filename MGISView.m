@@ -7,6 +7,7 @@
 //
 
 #import "MGISView.h"
+#import "ContentsObject.h"
 
 
 static int	RADIUS = 4;
@@ -137,7 +138,7 @@ static int	RADIUS = 4;
 	
 	// フェッチ
 	NSError *error;
-	NSArray *fetchedObjects = [context executeFetchRequest:request error: &error ];
+	NSArray *fetchedObjects = [context executeFetchRequest:request error: &error];
 	
 	// ズームレベルによって異なる定数を変数に保存しておく
 	float meterPerPixel = [self getMeterPerPixel];
@@ -227,6 +228,50 @@ static int	RADIUS = 4;
     NSPoint*	targetedPoint = NULL;
     NSPoint		locationInWindow = [event locationInWindow];
     
+    if ( [event clickCount] == 2 ) {
+        // ダブルクリック
+        if ( self.editingMode == ModeViewingMap ) {
+            // ダブルクリックされた場所へ移動する
+            // mouseUp のタイミングで移動すべきか？
+            float deltaX, deltaY;
+            deltaX = locationInWindow.x - [self bounds].size.width / 2.0;
+            deltaY = [self bounds].size.height / 2.0 - locationInWindow.y;
+            
+            // 移動量にピクセルあたりの距離を乗じて地図上の移動距離を計算する
+            float meterPerPixel = [self getMeterPerPixel];
+            self.center_x += deltaX * meterPerPixel;
+            self.center_y -= deltaY * meterPerPixel;
+            [self setNeedsDisplay:YES];
+            return;
+        }
+        if ( self.editingMode == ModeCreatingPolyline ) {
+            // ポリラインを確定させる
+            NSValue *aPolyline = [NSValue valueWithBytes:&creatingPolyline objCType:@encode(MGISPolyline)];
+            NSManagedObjectContext *context = [contentObject managedObjectContext];
+            NSEntityDescription *entity = [NSEntityDescription entityForName:@"Contents" inManagedObjectContext:context];
+//            NSManagedObject *object = [NSEntityDescription insertNewObjectForEntityForName:@"Contents"
+//                                                                    inManagedObjectContext:context];
+            NSManagedObject *object = [[NSManagedObject alloc] initWithEntity:entity
+                                               insertIntoManagedObjectContext:context];
+            // TODO:
+            //   値を設定しようとすると失敗する
+            //[object setValue:aPolyline forKey:@"shape"];
+            // TODO:
+            //   レイヤーの設定ができていない
+            [context insertObject:object];
+            
+            // 作成中ポリラインを破棄し、地図モードに戻る
+            [creatingPolyline release];
+            creatingPolyline = nil;
+            self.editingMode = ModeViewingMap;
+            
+            // 詳細ウィンドウを表示する
+            // その前に、追加したデータを選択してやる必要がある
+            [contentObject showDetailWindow:nil];
+            return;
+        }
+    }
+    
     if(NSPointInRect(locationInWindow, makeControlRect(_startPoint))) {
         targetedPoint = &_startPoint;
     }
@@ -304,6 +349,7 @@ static int	RADIUS = 4;
 	NSPoint mousePoint;
 	mousePoint = [event locationInWindow];
 	
+//    NSLog( @"click count %d", [event clickCount] );
     if ( dragging ) {
         // ドラッグ終了
         self.dragging = NO;
@@ -654,10 +700,12 @@ static int	RADIUS = 4;
     if ( temp ) {
         self.center_y = [temp floatValue];
     }
-    temp = [[NSNumber numberWithFloat:self.center_x] autorelease];
+    temp = [NSNumber numberWithFloat:self.center_x];
     [[userPrefs values] setValue:temp forKey:@"center_x"];
-    temp = [[NSNumber numberWithFloat:self.center_y] autorelease];
+//    [temp release];
+    temp = [NSNumber numberWithFloat:self.center_y];
     [[userPrefs values] setValue:temp forKey:@"center_y"];
+//    [temp release];
 }
 
 NSRect makeControlRect(NSPoint controlPoint)
