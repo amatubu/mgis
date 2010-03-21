@@ -34,6 +34,7 @@ static int	RADIUS = 4;
 @synthesize map_folder;
 @synthesize map_suffix;
 @synthesize zoom;
+@synthesize editingMode;
 @synthesize converter;
 
 // 初期化ルーチン
@@ -62,6 +63,9 @@ static int	RADIUS = 4;
 		// 地図のズームレベル
 		self.zoom = ZoomLarge;
 
+        // 編集モード
+        self.editingMode = ModeViewingMap;
+        
 		// 初期設定
 		[self setupDefaults];
 		
@@ -209,6 +213,11 @@ static int	RADIUS = 4;
     [[NSBezierPath bezierPathWithOvalInRect:makeControlRect(_ctrlPoint2)] fill];
     [NSBezierPath strokeLineFromPoint:_startPoint toPoint:_ctrlPoint1];
     [NSBezierPath strokeLineFromPoint:_endPoint toPoint:_ctrlPoint2];
+
+    // ポリラインコンテンツ
+    if ( self.editingMode == ModeCreatingPolyline ) {
+        [creatingPolyline draw];
+    }
 }
 
 // ビュー上でマウスボタンが押された際に呼ばれる
@@ -231,13 +240,15 @@ static int	RADIUS = 4;
         targetedPoint = &_ctrlPoint2;
     }
     
-    if(targetedPoint == NULL) {
-		// マウスボタンが押された座標を記録しておく
-		self.grabOrigin = [event locationInWindow];
-		//scrollOrigin = NSMakePoint( center_x, center_y );
-		
-		// ドラッグ開始
-		self.dragging = YES;
+    if ( targetedPoint == NULL ) {
+        if ( self.editingMode == ModeViewingMap ) {
+            // マウスボタンが押された座標を記録しておく
+            self.grabOrigin = [event locationInWindow];
+            //scrollOrigin = NSMakePoint( center_x, center_y );
+            
+            // ドラッグ開始
+            self.dragging = YES;
+        }
         return;
     }
     
@@ -265,24 +276,26 @@ static int	RADIUS = 4;
 // 地図をスクロールさせる
 - (void) mouseDragged: (NSEvent *) event
 {
-    NSPoint mousePoint;
-    mousePoint = [event locationInWindow];
+    if ( self.dragging ) {
+        NSPoint mousePoint;
+        mousePoint = [event locationInWindow];
 
-	// 直前に記録した位置からの移動量を計算する
-    float deltaX, deltaY;
-    deltaX = self.grabOrigin.x - mousePoint.x;
-    deltaY = mousePoint.y - self.grabOrigin.y;
-	self.grabOrigin = mousePoint;
-	
-	// 移動量にピクセルあたりの距離を乗じて地図上の移動距離を計算する
-	float meterPerPixel = [self getMeterPerPixel];
-	self.center_x += deltaX * meterPerPixel;
-	self.center_y -= deltaY * meterPerPixel;
-	
-	// ビューの内容を更新する必要があることを伝える
-	[self setNeedsDisplay:YES];
-	[self updateInfoWindow];
-	
+        // 直前に記録した位置からの移動量を計算する
+        float deltaX, deltaY;
+        deltaX = self.grabOrigin.x - mousePoint.x;
+        deltaY = mousePoint.y - self.grabOrigin.y;
+        self.grabOrigin = mousePoint;
+        
+        // 移動量にピクセルあたりの距離を乗じて地図上の移動距離を計算する
+        float meterPerPixel = [self getMeterPerPixel];
+        self.center_x += deltaX * meterPerPixel;
+        self.center_y -= deltaY * meterPerPixel;
+        
+        // ビューの内容を更新する必要があることを伝える
+        [self setNeedsDisplay:YES];
+        [self updateInfoWindow];
+        return;
+    }
 } // mouseDragged
 
 // ドラッグが終了したときに呼ばれる
@@ -291,9 +304,28 @@ static int	RADIUS = 4;
 	NSPoint mousePoint;
 	mousePoint = [event locationInWindow];
 	
-	// ドラッグ終了
-	self.dragging = NO;
-	[self setNeedsDisplay:YES];
+    if ( dragging ) {
+        // ドラッグ終了
+        self.dragging = NO;
+        [self setNeedsDisplay:YES];
+        return;
+    }
+
+    if ( self.editingMode == ModeCreatePolyline ) {
+        creatingPolyline = [[MGISPolyline alloc] init];
+        if ( creatingPolyline ) {
+            [creatingPolyline addPoint:mousePoint];
+        }
+        self.editingMode = ModeCreatingPolyline;
+        [self setNeedsDisplay:YES];
+        return;
+    }
+    if ( self.editingMode == ModeCreatingPolyline ) {
+        
+        [creatingPolyline addPoint:mousePoint];
+        [self setNeedsDisplay:YES];
+        return;
+    }
 } // mouseUp
 
 // オフスクリーンイメージを更新する

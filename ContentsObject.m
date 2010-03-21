@@ -164,6 +164,7 @@
 
 - (IBAction) createPolylineContent:(id)sender {
 	NSLog( @"createPolylineContent %@", sender );
+    mgisView.editingMode = ModeCreatePolyline;
 }
 
 - (IBAction) createPolygonContent:(id)sender {

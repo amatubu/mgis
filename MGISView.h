@@ -8,6 +8,7 @@
 
 #import <AppKit/NSView.h>
 #import "CoordinateConverter.h"
+#import "MGISPolyline.h"
 
 typedef enum {
     ZoomDetail = 0,
@@ -16,6 +17,18 @@ typedef enum {
     ZoomLarge,
 	ZoomLarge2,
 } ZoomLevel;
+
+typedef enum {
+    ModeViewingMap = 0,
+    ModeCreatePoint,
+    ModeCreatePolyline,
+    ModeCreatePolygon,
+    ModeCreateText,
+    ModeCreatingPoint,
+    ModeCreatingPolyline,
+    ModeCreatingPolygon,
+    ModeCreatingText,
+} EditingMode;
 
 #define MAP_IMAGE_WIDTH  640.0
 #define MAP_IMAGE_HEIGHT 480.0
@@ -61,6 +74,7 @@ typedef enum {
 	NSString *offscreenMapSuffix;
 
 	ZoomLevel zoom;
+    EditingMode editingMode;
 
 	NSString *map_folder;
 	NSString *map_suffix;
@@ -72,6 +86,8 @@ typedef enum {
     NSPoint	_endPoint;
     NSPoint	_ctrlPoint1;
     NSPoint	_ctrlPoint2;
+
+    MGISPolyline *creatingPolyline;
 }
 
 - (void) setupDefaults;
@@ -114,6 +130,7 @@ typedef enum {
 @property (retain) NSString *map_folder;
 @property (retain) NSString *map_suffix;
 @property ZoomLevel zoom;
+@property EditingMode editingMode;
 
 @property (retain) CoordinateConverter *converter;
 @end
