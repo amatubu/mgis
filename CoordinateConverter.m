@@ -58,10 +58,10 @@
 
 	double p1 = [self calcLatitudeFromY:XY.y p0:p0];
 
-	double n1 = a / sqrt( 1.0 - e2 * pow( sin( p1 ), 2.0 ) );
+	double n1 = self.a / sqrt( 1.0 - self.e2 * pow( sin( p1 ), 2.0 ) );
 	double xm0 = XY.x / m0;
 	double t1 = tan( p1 );
-	double eta2 = et2 * pow( cos( p1 ), 2.0 );
+	double eta2 = self.et2 * pow( cos( p1 ), 2.0 );
 	double t1_2 = t1 * t1;
 	double t1_4 = t1_2 * t1_2;
 	double t1_6 = t1_2 * t1_4;
@@ -109,10 +109,10 @@
 	double s0 = [self calcMeridianLengthFromLatitude:p0];
 
 	// 
-	double n = a / sqrt( 1.0 - e2 * pow( sin( p ), 2.0 ) );
+	double n = self.a / sqrt( 1.0 - self.e2 * pow( sin( p ), 2.0 ) );
 	double dr = r - r0;
 	double cp = cos( p );
-	double eta2 = et2 * pow( cp, 2.0 );
+	double eta2 = self.et2 * pow( cp, 2.0 );
 	double t = tan( p );
 	double t2 = t * t;
 	double t4 = t2 * t2;
@@ -141,14 +141,14 @@
 - (double) calcMeridianLengthFromLatitude: (double)p
 {
 	// 定数
-	double e4  = e2 * e2;
-	double e6  = e2 * e4;
+	double e4  = self.e2 * self.e2;
+	double e6  = self.e2 * e4;
 	double e8  = e4 * e4;
 	double e10 = e4 * e6;
 	double e12 = e6 * e6;
 	double e14 = e6 * e8;
 	double e16 = e8 * e8;
-	double aa = 1.0                                   + (         3.0 /         4.0 ) * e2
+	double aa = 1.0                                   + (         3.0 /         4.0 ) * self.e2
 	          + (         45.0 /         64.0 ) * e4  + (       175.0 /       256.0 ) * e6
 			  + (      11025.0 /      16384.0 ) * e8  + (     43659.0 /     65536.0 ) * e10
 	          + (     693693.0 /    1048576.0 ) * e12 + (  19324305.0 /  29360128.0 ) * e14
@@ -177,15 +177,15 @@
 	double hh = (      45045.0 /  117440512.0 ) * e14 + (    765765.0 / 469762048.0 ) * e16;
 	double ii = (     765765.0 / 7516192768.0 ) * e16;
 	
-	double b1 = a * ( 1.0 - e2 ) *    aa;
-	double b2 = a * ( 1.0 - e2 ) * ( -bb /  2.0 );
-	double b3 = a * ( 1.0 - e2 ) * (  cc /  4.0 );
-	double b4 = a * ( 1.0 - e2 ) * ( -dd /  6.0 );
-	double b5 = a * ( 1.0 - e2 ) * (  ee /  8.0 );
-	double b6 = a * ( 1.0 - e2 ) * ( -ff / 10.0 );
-	double b7 = a * ( 1.0 - e2 ) * (  gg / 12.0 );
-	double b8 = a * ( 1.0 - e2 ) * ( -hh / 14.0 );
-	double b9 = a * ( 1.0 - e2 ) * (  ii / 16.0 );
+	double b1 = self.a * ( 1.0 - self.e2 ) *    aa;
+	double b2 = self.a * ( 1.0 - self.e2 ) * ( -bb /  2.0 );
+	double b3 = self.a * ( 1.0 - self.e2 ) * (  cc /  4.0 );
+	double b4 = self.a * ( 1.0 - self.e2 ) * ( -dd /  6.0 );
+	double b5 = self.a * ( 1.0 - self.e2 ) * (  ee /  8.0 );
+	double b6 = self.a * ( 1.0 - self.e2 ) * ( -ff / 10.0 );
+	double b7 = self.a * ( 1.0 - self.e2 ) * (  gg / 12.0 );
+	double b8 = self.a * ( 1.0 - self.e2 ) * ( -hh / 14.0 );
+	double b9 = self.a * ( 1.0 - self.e2 ) * (  ii / 16.0 );
 	
 	// 緯度から赤道からの子午線長を求める
 	double s = b1 * p
@@ -205,8 +205,8 @@
 	double pn = p0;
 	while ( YES ) {
 		double sn = [self calcMeridianLengthFromLatitude:pn];
-		double v1 = 2 * ( sn - m ) * pow(  1 - e2 * pow( sin( pn ), 2.0 ), ( 3.0 / 2.0 ) );
-		double v2 = 3 * e2 * ( sn - m ) * sin( pn ) * cos( pn ) * sqrt( 1 - e2 * pow( sin( pn ), 2.0 ) ) - 2 * a * ( 1 - e2 );
+		double v1 = 2 * ( sn - m ) * pow(  1 - self.e2 * pow( sin( pn ), 2.0 ), ( 3.0 / 2.0 ) );
+		double v2 = 3 * self.e2 * ( sn - m ) * sin( pn ) * cos( pn ) * sqrt( 1 - self.e2 * pow( sin( pn ), 2.0 ) ) - 2 * self.a * ( 1 - self.e2 );
 		double v = v1 / v2;
 		pn += v;
 		// TODO:

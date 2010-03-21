@@ -53,7 +53,6 @@ typedef enum {
 
 	BOOL dragging;
     NSPoint grabOrigin;
-    NSPoint scrollOrigin;
 
 	NSImage *offscreenImage;
 	NSPoint offscreenOrigin;
@@ -106,6 +105,7 @@ typedef enum {
 @property (retain) id scale;
 @property BOOL first_draw;
 @property BOOL dragging;
+@property NSPoint grabOrigin;
 @property (retain) NSImage *offscreenImage;
 @property NSPoint offscreenOrigin;
 @property NSRect offscreenRect;
@@ -113,6 +113,7 @@ typedef enum {
 @property (retain) NSString *offscreenMapSuffix;
 @property (retain) NSString *map_folder;
 @property (retain) NSString *map_suffix;
+@property ZoomLevel zoom;
 
 @property (retain) CoordinateConverter *converter;
 @end

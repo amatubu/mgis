@@ -9,7 +9,7 @@
 #import "MGISView.h"
 
 
-static int	RADIUS = 2;
+static int	RADIUS = 4;
 
 @implementation MGISView
 
@@ -25,6 +25,7 @@ static int	RADIUS = 2;
 @synthesize scale;
 @synthesize first_draw;
 @synthesize dragging;
+@synthesize grabOrigin;
 @synthesize offscreenImage;
 @synthesize offscreenOrigin;
 @synthesize offscreenRect;
@@ -32,6 +33,7 @@ static int	RADIUS = 2;
 @synthesize offscreenMapSuffix;
 @synthesize map_folder;
 @synthesize map_suffix;
+@synthesize zoom;
 @synthesize converter;
 
 // 初期化ルーチン
@@ -39,44 +41,44 @@ static int	RADIUS = 2;
     self = [super initWithFrame:frame];
     if (self) {
         // 地図の画像ファイルが保存されているパス
-//		map_folder = @"/Users/sent/Library/Application Data/M-GIS/map/200403/";
+//		self.map_folder = @"/Users/sent/Library/Application Data/M-GIS/map/200403/";
 		NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
 		NSString *basePath = ([paths count] > 0 ) ? [paths objectAtIndex:0] : NSTemporaryDirectory();
-		map_folder = [[basePath stringByAppendingPathComponent:@"M-GIS/map/200403/"] retain];
+		self.map_folder = [[basePath stringByAppendingPathComponent:@"M-GIS/map/200403/"] retain];
 
 		// 画面の中心の座標の初期値
 		// 直交座標系 VI 系
 		// TODO:
 		//   最後に表示していた場所を記録するようにしたい
-		center_x = 46665.476f;
-		center_y = -140941.652f;
+		self.center_x = 46665.476f;
+		self.center_y = -140941.652f;
 
 		// 最初の描画
-		first_draw = YES;
+		self.first_draw = YES;
 		
 		// 地図のフォーマット(拡張子)
-		map_suffix = @".jpg";
+		self.map_suffix = @".jpg";
 		
 		// 地図のズームレベル
-		zoom = ZoomLarge;
+		self.zoom = ZoomLarge;
 
 		// 初期設定
 		[self setupDefaults];
 		
-		converter = [[CoordinateConverter coordinateConverterWithSpheroidalType:@"bessel"] retain];
+		self.converter = [[CoordinateConverter coordinateConverterWithSpheroidalType:@"bessel"] retain];
 		
-		dragging = NO;
+		self.dragging = NO;
 	}
     return self;
 }
 
 - (void)dealloc {
 	
-    [converter release];
-	[offscreenImage release];
-	[offscreenMapSuffix release];
-	[map_folder release];
-	[map_suffix release];
+    [self.converter release];
+	[self.offscreenImage release];
+	[self.offscreenMapSuffix release];
+	[self.map_folder release];
+	[self.map_suffix release];
 	
     [super dealloc];
 }
@@ -106,7 +108,7 @@ static int	RADIUS = 2;
 		// 情報ウィンドウやスケールの内容を更新する
 		[self updateInfoWindow];
 		[self updateScaleText];
-		first_draw = NO;
+		self.first_draw = NO;
 	}
 
 	// コンテクストを得る
@@ -141,14 +143,14 @@ static int	RADIUS = 2;
 	// 画面の左下の座標(原点)に表示すべき地図を調べる
 	// x は、画面の左下の座標(原点)の地図上の横位置
 	// x_offset,y_offset は、そこに表示すべき地図の、原点からのオフセット
-	float x = center_x - [self bounds].size.width / 2.0 * meterPerPixel;
-	float y = center_y - [self bounds].size.height / 2.0 * meterPerPixel;
+	float x = self.center_x - [self bounds].size.width / 2.0 * meterPerPixel;
+	float y = self.center_y - [self bounds].size.height / 2.0 * meterPerPixel;
 	float x_offset = - ( x - floor( x / mapWidth ) * mapWidth ) / meterPerPixel;
 	float y_offset = - ( y - floor( y / mapHeight ) * mapHeight ) / meterPerPixel;
 
 	float mapImageWidth  = MAP_IMAGE_WIDTH;
 	float mapImageHeight = MAP_IMAGE_HEIGHT;
-	if ( zoom == ZoomLarge2 || zoom == ZoomMiddle2 ) {
+	if ( self.zoom == ZoomLarge2 || self.zoom == ZoomMiddle2 ) {
 		mapImageWidth  /= 2.0;
 		mapImageHeight /= 2.0;
 	}
@@ -158,16 +160,16 @@ static int	RADIUS = 2;
 	// 2.地図の種類が同じかどうか
 	// 3.画面の右下の点が前に作成した画像の範囲内かどうか
 	// 4.画面の左上の点が前に作成した画像の範囲内かどうか
-	if ( dragging || // ドラッグ中ならば無条件に使用する
-		 ( zoom == offscreenZoom && // 1
-		   [map_suffix compare:offscreenMapSuffix] == NSOrderedSame && // 2
-		   NSPointInRect( NSMakePoint( x, y ), offscreenRect ) && // 3
-		   NSPointInRect( NSMakePoint( center_x * 2 - x,
-									   center_y * 2 - y ), offscreenRect ) ) ) { // 4
+	if ( self.dragging || // ドラッグ中ならば無条件に使用する
+		 ( self.zoom == offscreenZoom && // 1
+		   [self.map_suffix compare:self.offscreenMapSuffix] == NSOrderedSame && // 2
+		   NSPointInRect( NSMakePoint( x, y ), self.offscreenRect ) && // 3
+		   NSPointInRect( NSMakePoint( self.center_x * 2 - x,
+									   self.center_y * 2 - y ), self.offscreenRect ) ) ) { // 4
 
 		// 前に使用した画像がそのまま使える
-		x_offset = [self bounds].size.width  / 2.0 + ( offscreenRect.origin.x - center_x ) / meterPerPixel;
-		y_offset = [self bounds].size.height / 2.0 + ( offscreenRect.origin.y - center_y ) / meterPerPixel;
+		x_offset = [self bounds].size.width  / 2.0 + ( self.offscreenRect.origin.x - self.center_x ) / meterPerPixel;
+		y_offset = [self bounds].size.height / 2.0 + ( self.offscreenRect.origin.y - self.center_y ) / meterPerPixel;
 	} else {
 		// そのまま使うことができないので、新しく作成する
 		float offscreenWidth = mapImageWidth * ( floor( ( [self bounds].size.width - x_offset ) / mapImageWidth ) + 1 );
@@ -178,16 +180,16 @@ static int	RADIUS = 2;
 
 		// オフスクリーンイメージを作ったときの状態を保存しておく
 		// 再利用できるかどうかの判断に使うため
-		offscreenRect = NSMakeRect( x + x_offset * meterPerPixel,
-									y + y_offset * meterPerPixel,
-									offscreenWidth * meterPerPixel,
-									offscreenHeight * meterPerPixel );
-		offscreenZoom = zoom;
-		offscreenOrigin = NSMakePoint( center_x, center_y );
-		offscreenMapSuffix = map_suffix;
+		self.offscreenRect = NSMakeRect( x + x_offset * meterPerPixel,
+									     y + y_offset * meterPerPixel,
+									     offscreenWidth * meterPerPixel,
+									     offscreenHeight * meterPerPixel );
+		self.offscreenZoom = self.zoom;
+		self.offscreenOrigin = NSMakePoint( self.center_x, self.center_y );
+		self.offscreenMapSuffix = self.map_suffix;
 	}
-	[offscreenImage compositeToPoint:NSMakePoint( x_offset, y_offset )
-						   operation:NSCompositeSourceOver];
+	[self.offscreenImage compositeToPoint:NSMakePoint( x_offset, y_offset )
+						        operation:NSCompositeSourceOver];
 	
 	[self drawCenterMarker:(NSRect)rect];
 
@@ -231,17 +233,17 @@ static int	RADIUS = 2;
     
     if(targetedPoint == NULL) {
 		// マウスボタンが押された座標を記録しておく
-		grabOrigin = [event locationInWindow];
-		scrollOrigin = NSMakePoint( center_x, center_y );
+		self.grabOrigin = [event locationInWindow];
+		//scrollOrigin = NSMakePoint( center_x, center_y );
 		
 		// ドラッグ開始
-		dragging = YES;
+		self.dragging = YES;
         return;
     }
     
     // Track mouse dragging
     while(1) {
-        NSEvent*	evt = [NSApp nextEventMatchingMask:(NSLeftMouseDraggedMask | NSLeftMouseUpMask) untilDate:nil inMode:NSEventTrackingRunLoopMode dequeue:YES];
+        NSEvent *evt = [NSApp nextEventMatchingMask:(NSLeftMouseDraggedMask | NSLeftMouseUpMask) untilDate:nil inMode:NSEventTrackingRunLoopMode dequeue:YES];
         
         if([evt type] == NSLeftMouseUp) {
             break;
@@ -268,14 +270,14 @@ static int	RADIUS = 2;
 
 	// 直前に記録した位置からの移動量を計算する
     float deltaX, deltaY;
-    deltaX = grabOrigin.x - mousePoint.x;
-    deltaY = mousePoint.y - grabOrigin.y;
-	grabOrigin = mousePoint;
+    deltaX = self.grabOrigin.x - mousePoint.x;
+    deltaY = mousePoint.y - self.grabOrigin.y;
+	self.grabOrigin = mousePoint;
 	
 	// 移動量にピクセルあたりの距離を乗じて地図上の移動距離を計算する
 	float meterPerPixel = [self getMeterPerPixel];
-	center_x += deltaX * meterPerPixel;
-	center_y -= deltaY * meterPerPixel;
+	self.center_x += deltaX * meterPerPixel;
+	self.center_y -= deltaY * meterPerPixel;
 	
 	// ビューの内容を更新する必要があることを伝える
 	[self setNeedsDisplay:YES];
@@ -290,7 +292,7 @@ static int	RADIUS = 2;
 	mousePoint = [event locationInWindow];
 	
 	// ドラッグ終了
-	dragging = NO;
+	self.dragging = NO;
 	[self setNeedsDisplay:YES];
 } // mouseUp
 
@@ -307,11 +309,11 @@ static int	RADIUS = 2;
 	}
 	
 	// 最初に、以前作成したイメージを解放する
-	[offscreenImage release];
+	[self.offscreenImage release];
 
 	// 新しいイメージを作成し、描画していく
-	offscreenImage = [[NSImage alloc] initWithSize:size];
-	[offscreenImage lockFocus];
+	self.offscreenImage = [[NSImage alloc] initWithSize:size];
+	[self.offscreenImage lockFocus];
 
 	// x は、画面の左下の座標(原点)の地図上の横位置
 	// imageOffsetX は、そこに表示すべき地図の、原点からのオフセット
@@ -331,11 +333,11 @@ static int	RADIUS = 2;
 			NSString *meshString = [self getLargeMesh:NSMakePoint( x, y )];
 			
 			NSString *mapFile;
-			switch (zoom) {
+			switch (self.zoom) {
 				case ZoomLarge:
 				case ZoomLarge2:
 					// LARGE サイズの場合は、LARGE フォルダに「メッシュコード名.*」という形式で保存されている
-					mapFile = [map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"LARGE/%@%@%@",
+					mapFile = [self.map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"LARGE/%@%@%@",
 																		  @"06", meshString, map_suffix]];
 					break;
 				case ZoomMiddle:
@@ -346,7 +348,7 @@ static int	RADIUS = 2;
 					NSString *middleMeshString = [self getMiddleMesh:NSMakePoint( x, y )];
 					NSLog(@"Middle mesh: %@", middleMeshString);
 					NSLog(@"Path %@", [NSString stringWithFormat:@"MIDDLE/%@%@/%@%@%@%@", @"06", meshString, @"06", meshString, middleMeshString, map_suffix]);
-					mapFile = [map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"MIDDLE/%@%@/%@%@%@%@",
+					mapFile = [self.map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"MIDDLE/%@%@/%@%@%@%@",
 																		  @"06",meshString,@"06",meshString,middleMeshString,map_suffix]];
 				}
 					break;
@@ -355,7 +357,7 @@ static int	RADIUS = 2;
 					// メッシュコード名のフォルダがあり、その中に保存されている
 				{
 					NSString *detailMeshString = [self getDetailMesh:NSMakePoint( x, y )];
-					mapFile = [map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"DETAIL/%@%@/%@%@%@%@",
+					mapFile = [self.map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"DETAIL/%@%@/%@%@%@%@",
 																		  @"06",meshString,@"06",meshString,detailMeshString,map_suffix]];
 				}
 					break;
@@ -376,7 +378,6 @@ static int	RADIUS = 2;
 						  operation:NSCompositeSourceOver fraction:1.0];
 				[anImage release];
 			}
-			//			[fileUrl release];
 			
 			// Y 方向の次のメッシュへ
 			y += mapImageHeight * meterPerPixel;
@@ -386,35 +387,36 @@ static int	RADIUS = 2;
 		x += mapImageWidth * meterPerPixel;
 		imageOffsetX += mapImageWidth;
 	}
-	[offscreenImage unlockFocus];
+	[self.offscreenImage unlockFocus];
 }	
 
 // 情報ウィンドウの内容を更新する
 // 現在は中心点の直交座標系での座標のみを表示
 // 起動時や、ズームレベルを変更したときに呼ばれる
 - (void) updateInfoWindow {
-	[info_x setStringValue:[NSString stringWithFormat:@"%02.3f m", center_x]];
-	[info_y setStringValue:[NSString stringWithFormat:@"%02.3f m", center_y]];
+	[self.info_x setStringValue:[NSString stringWithFormat:@"%02.3f m", center_x]];
+	[self.info_y setStringValue:[NSString stringWithFormat:@"%02.3f m", center_y]];
 
 	double latitude,longitude;
-	[converter getLatLongFromXY:NSMakePoint(center_x,center_y) latitude:&latitude longitude:&longitude kei:6];
+	[self.converter getLatLongFromXY:NSMakePoint(self.center_x, self.center_y)
+                            latitude:&latitude longitude:&longitude kei:6];
 
 	int d = (int)floor(latitude);
 	int m = (int)floor( fmod( latitude * 60.0, 60.0 ) );
 	double s = fmod( latitude * 3600.0, 60.0 );
-	[info_latitude setStringValue:[NSString stringWithFormat:@"%02d°%02d\'%02.3f\"", d, m, s]];
+	[self.info_latitude setStringValue:[NSString stringWithFormat:@"%02d°%02d\'%02.3f\"", d, m, s]];
 
 	d = (int)floor( longitude );
 	m = (int)floor( fmod( longitude * 60.0, 60.0 ) );
 	s = fmod( longitude * 3600.0, 60.0 );
-	[info_longitude setStringValue:[NSString stringWithFormat:@"%02d°%02d\'%02.3f\"", d, m, s]];
+	[self.info_longitude setStringValue:[NSString stringWithFormat:@"%02d°%02d\'%02.3f\"", d, m, s]];
 }
 
 // 縮尺をあらわすスケールを更新する
 // 起動時や、ズームレベルを変更したときに呼ばれる
 - (void) updateScaleText {
 	float meterPer80Pixels = [self getMeterPerPixel] * 80.0;
-	[scale setStringValue:[NSString stringWithFormat:@"%d m", (int)meterPer80Pixels]];
+	[self.scale setStringValue:[NSString stringWithFormat:@"%d m", (int)meterPer80Pixels]];
 }
 
 // 中心に印を表示する
@@ -435,9 +437,9 @@ static int	RADIUS = 2;
 
 // 地図のズームレベルを変更した際に呼ばれる
 - (IBAction) changeZoomLevel: (id)sender {
-	int prevZoom = zoom;
-	zoom = ZoomLarge2 - [zoomSlider intValue];
-	if ( zoom != prevZoom ) {
+	int prevZoom = self.zoom;
+	self.zoom = ZoomLarge2 - [self.zoomSlider intValue];
+	if ( self.zoom != prevZoom ) {
 		[self setNeedsDisplay:YES];
 		[self updateScaleText];
 	}
@@ -446,15 +448,15 @@ static int	RADIUS = 2;
 
 // 地図フォーマット切り替えボタンがクリックされたら、地図の拡張子を切り替える
 - (IBAction) changeMapFormat: (id)sender {
-	switch ([mapFormat selectedSegment]) {
+	switch ([self.mapFormat selectedSegment]) {
 		case 0:
-			map_suffix = @".png";
+			self.map_suffix = @".png";
 			break;
 		case 1:
-			map_suffix = @".jpg";
+			self.map_suffix = @".jpg";
 			break;
 		default:
-			map_suffix = @".jpg";
+			self.map_suffix = @".jpg";
 			break;
 	}
 	[self setNeedsDisplay:YES];
@@ -540,7 +542,7 @@ static int	RADIUS = 2;
 // ピクセルあたりの距離を調べる
 - (float) getMeterPerPixel {
 	float meterPerPixel = LARGE_MAP_METER_PER_PIXEL;
-	switch (zoom) {
+	switch (self.zoom) {
 		case ZoomLarge:
 			meterPerPixel = LARGE_MAP_METER_PER_PIXEL;
 			break;
@@ -565,7 +567,7 @@ static int	RADIUS = 2;
 // ひとつのメッシュの横方向の距離を調べる
 - (float) getMapWidth {
 	float mapWidth = LARGE_MAP_WIDTH;
-	switch (zoom) {
+	switch (self.zoom) {
 		case ZoomLarge:
 		case ZoomLarge2:
 			mapWidth = LARGE_MAP_WIDTH;
@@ -586,7 +588,7 @@ static int	RADIUS = 2;
 // ひとつのメッシュの縦方向の距離を調べる
 - (float) getMapHeight {
 	float mapHeight = LARGE_MAP_HEIGHT;
-	switch (zoom) {
+	switch (self.zoom) {
 		case ZoomLarge:
 		case ZoomLarge2:
 			mapHeight = LARGE_MAP_HEIGHT;
@@ -628,7 +630,7 @@ static int	RADIUS = 2;
 
 NSRect makeControlRect(NSPoint controlPoint)
 {
-    return NSMakeRect(controlPoint.x - RADIUS * 2, controlPoint.y - RADIUS * 2, RADIUS * 4, RADIUS * 4);
+    return NSMakeRect(controlPoint.x - RADIUS, controlPoint.y - RADIUS, RADIUS * 2, RADIUS * 2);
 }
 
 
