@@ -116,41 +116,7 @@ static int	RADIUS = 4;
 		self.first_draw = NO;
 	}
 
-	// コンテクストを得る
-	NSManagedObjectContext *context = [contentObject managedObjectContext];
-	
-	// 検索条件
-	// BOOL 値は、「= NO」で比較できるようだ
-	// リレーションについても、リレーション名.アトリビュート名で指定できる
-//	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = 'name'"];
-    //   途中で Layers の hidden を有効にしても、保存するまで抽出条件に反映されない
-    //   Contents の hidden を有効にした場合は即座に反映される
-	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"hidden = NO and layer.hidden = NO"];
-
-	// 検索対象のエンティティ
-	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Contents"
-                                              inManagedObjectContext:context];
-	
-	// リクエストを新規作成し、検索対象と検索条件を設定
-	NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
-	[request setEntity:entity];
-	[request setPredicate:predicate];
-
-	// 取り出す最大数
-	[request setFetchLimit:10];
-	
-	// フェッチ
-	NSError *error;
-	NSArray *fetchedObjects = [context executeFetchRequest:request error:&error];
-    NSLog( @"Number of visible contents: %d", [fetchedObjects count] );
-    /*
-    for ( NSInteger index = 0; index < [fetchedObjects count]; index++ ) {
-        NSNumber *layer = [[fetchedObjects objectAtIndex:index] valueForKey:@"layer"];
-        NSLog( @"layer %@", layer );
-        NSString *name = [[fetchedObjects objectAtIndex:index] valueForKey:@"name"];
-        NSLog( @"name %@", name );
-    }*/
-	
+    // 地図の描画
 	// ズームレベルによって異なる定数を変数に保存しておく
 	float meterPerPixel = [self getMeterPerPixel];
 	float mapWidth = [self getMapWidth];
@@ -207,8 +173,55 @@ static int	RADIUS = 4;
 	[self.offscreenImage compositeToPoint:NSMakePoint( x_offset, y_offset )
 						        operation:NSCompositeSourceOver];
 	
+    // 地図上のコンテンツの描画
+	// コンテクストを得る
+	NSManagedObjectContext *context = [contentObject managedObjectContext];
+	
+	// 検索条件
+	// BOOL 値は、「= NO」で比較できるようだ
+	// リレーションについても、リレーション名.アトリビュート名で指定できる
+    //	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = 'name'"];
+    //   途中で Layers の hidden を有効にしても、保存するまで抽出条件に反映されない
+    //   Contents の hidden を有効にした場合は即座に反映される
+	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"hidden = NO and layer.hidden = NO"];
+    
+	// 検索対象のエンティティ
+	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Contents"
+                                              inManagedObjectContext:context];
+	
+	// リクエストを新規作成し、検索対象と検索条件を設定
+	NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+	[request setEntity:entity];
+	[request setPredicate:predicate];
+    
+	// 取り出す最大数
+	[request setFetchLimit:10];
+	
+	// フェッチ
+	NSError *error;
+	NSArray *fetchedObjects = [context executeFetchRequest:request error:&error];
+    NSLog( @"Number of visible contents: %d", [fetchedObjects count] );
+    
+    for ( NSInteger index = 0; index < [fetchedObjects count]; index++ ) {
+        NSNumber *layer = [[fetchedObjects objectAtIndex:index] valueForKey:@"layer"];
+        NSLog( @"layer %@", layer );
+        NSString *name = [[fetchedObjects objectAtIndex:index] valueForKey:@"name"];
+        NSLog( @"name %@", name );
+        
+        // ポリラインの描画
+        // TODO:
+        //   地図上の位置に変換する必要がある
+        //   かなり効率が悪いやり方だと思うので、効率化を検討する
+        //   画面外のものは描画する必要なし
+        NSData *shape = [[fetchedObjects objectAtIndex:index] valueForKey:@"shape"];
+        MGISPolyline *polyline = [NSKeyedUnarchiver unarchiveObjectWithData:shape];
+        [polyline draw];
+    }
+    
+    // 中心に印を描画する
 	[self drawCenterMarker:(NSRect)rect];
 
+    // 画面上に描かれた図形編集のイメージ
     NSBezierPath *bezier = [NSBezierPath bezierPath];
     
     // Draw curve
@@ -257,7 +270,9 @@ static int	RADIUS = 4;
         }
         if ( self.editingMode == ModeCreatingPolyline ) {
             // ポリラインを確定させる
-            NSValue *aPolyline = [NSValue valueWithBytes:&creatingPolyline objCType:@encode(MGISPolyline)];
+            // TODO:
+            //   地図上の位置に変換する必要がある
+            NSData *aPolyline = [NSKeyedArchiver archivedDataWithRootObject:creatingPolyline];
             [contentObject insertPolylineContent:aPolyline];
             
             // 作成中ポリラインを破棄し、地図モードに戻る

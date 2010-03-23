@@ -167,6 +167,7 @@
 	NSLog( @"createPolylineContent %@", sender );
     mgisView.editingMode = ModeCreatePolyline;
     [shapeParamPanel makeKeyAndOrderFront:self];
+    [[mgisView window] makeKeyAndOrderFront:self];
 }
 
 - (IBAction) createPolygonContent:(id)sender {
@@ -178,18 +179,18 @@
 }
 
 // ポリラインを追加する
-- (void) insertPolylineContent:(NSValue *)aPolyline {
+- (void) insertPolylineContent:(NSData *)aPolyline {
     NSManagedObjectContext *context = [self managedObjectContext];
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Contents"                                       inManagedObjectContext:context];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Contents"
+                                              inManagedObjectContext:context];
     //            NSManagedObject *object = [NSEntityDescription insertNewObjectForEntityForName:@"Contents"
     //                                                                    inManagedObjectContext:context];
     NSManagedObject *object = [[NSManagedObject alloc] initWithEntity:entity
                                        insertIntoManagedObjectContext:context];
-    // TODO:
-    //   値を設定しようとすると失敗する
+    // 図形を設定する
     NSError *error;
     if ( [object validateValue:&aPolyline forKey:@"shape" error:&error] ) {
-        //[object setValue:aPolyline forKey:@"shape"];
+        [object setValue:aPolyline forKey:@"shape"];
     } else {
         NSLog( @"Error %@ returned from validateValue:forKey:error", error );
     }

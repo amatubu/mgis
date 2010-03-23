@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface MGISPolyline : NSObject {
+@interface MGISPolyline : NSObject <NSCoding> {
     NSRect bounds;
     NSMutableArray *points;
     CGFloat lineWidth;

@@ -42,6 +42,6 @@
 - (IBAction) createPolygonContent:(id)sender;
 - (IBAction) createTextContent:(id)sernder;
 
-- (void) insertPolylineContent:(NSValue *)aPolyline;
+- (void) insertPolylineContent:(NSData *)aPolyline;
 
 @end
