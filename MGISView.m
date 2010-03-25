@@ -174,6 +174,10 @@ static int	RADIUS = 4;
 						        operation:NSCompositeSourceOver];
 	
     // 地図上のコンテンツの描画
+    // クリックテストに利用するコンテンツリスト
+//    [shapes release];
+    shapes = [[NSMutableArray alloc] init];
+    
 	// コンテクストを得る
 	NSManagedObjectContext *context = [contentObject managedObjectContext];
 	
@@ -203,9 +207,10 @@ static int	RADIUS = 4;
     NSLog( @"Number of visible contents: %d", [fetchedObjects count] );
     
     for ( NSInteger index = 0; index < [fetchedObjects count]; index++ ) {
-        NSNumber *layer = [[fetchedObjects objectAtIndex:index] valueForKey:@"layer"];
-        NSLog( @"layer %@", layer );
-        NSString *name = [[fetchedObjects objectAtIndex:index] valueForKey:@"name"];
+        NSManagedObject *aObject = [fetchedObjects objectAtIndex:index];
+        NSNumber *layer = [aObject valueForKey:@"layer"];
+//        NSLog( @"layer %@", layer );
+        NSString *name = [aObject valueForKey:@"name"];
         NSLog( @"name %@", name );
         
         // ポリラインの描画
@@ -213,9 +218,15 @@ static int	RADIUS = 4;
         //   地図上の位置に変換する必要がある
         //   かなり効率が悪いやり方だと思うので、効率化を検討する
         //   画面外のものは描画する必要なし
-        NSData *shape = [[fetchedObjects objectAtIndex:index] valueForKey:@"shape"];
-        MGISPolyline *polyline = [NSKeyedUnarchiver unarchiveObjectWithData:shape];
-        [polyline draw];
+        NSData *shape = [aObject valueForKey:@"shape"];
+        if ( shape ) {
+            MGISPolyline *polyline = [NSKeyedUnarchiver unarchiveObjectWithData:shape];
+            if ( polyline ) {
+                polyline.objectID = [aObject objectID];
+                [polyline draw:(polyline.objectID == selectedPolyline.objectID)];
+                [shapes addObject:[polyline retain]];
+            }
+        }
     }
     
     // 中心に印を描画する
@@ -241,7 +252,7 @@ static int	RADIUS = 4;
 
     // ポリラインコンテンツ
     if ( self.editingMode == ModeCreatingPolyline ) {
-        [creatingPolyline draw];
+        [creatingPolyline draw:NO];
     }
 }
 
@@ -283,6 +294,21 @@ static int	RADIUS = 4;
             // ビューを更新させる必要がある
             [self setNeedsDisplay:YES];
             return;
+        }
+    }
+    
+    // コンテンツの上でクリックされたかどうかを調べる
+    // TODO:
+    //   地図上の座標で調べる必要がある
+    selectedPolyline = nil;
+    for ( NSInteger index = 0; index < [shapes count]; index++ ) {
+        if ( [[shapes objectAtIndex:index] clickCheck:locationInWindow] ) {
+            NSLog( @"mouse %f, %f hits %d th object", locationInWindow.x, locationInWindow.y, index );
+            // 選択
+            // TODO:
+            //   mouseUp で、ドラッグでない場合に処理するべき
+            selectedPolyline = [shapes objectAtIndex:index];
+            break;
         }
     }
     

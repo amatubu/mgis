@@ -15,11 +15,12 @@
     CGFloat lineWidth;
     NSBezierPath *shapeBezier;
     NSColor *lineColor;
+    NSManagedObjectID *objectID;
 }
 
 - (void) addPoint:(NSPoint)aPoint;
-- (void) draw;
-- (BOOL) hitTest:(NSPoint)point;
+- (void) draw:(BOOL)selected;
+- (BOOL) clickCheck:(NSPoint)point;
 - (float) calcDistance:(NSPoint)point lineFrom:(NSPoint)lineStart lineTo:(NSPoint)lineEnd;
 
 @property NSRect bounds;
@@ -27,5 +28,6 @@
 @property CGFloat lineWidth;
 @property (retain) NSBezierPath *shapeBezier;
 @property (retain) NSColor *lineColor;
+@property (retain) NSManagedObjectID *objectID;
 
 @end

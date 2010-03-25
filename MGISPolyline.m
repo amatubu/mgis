@@ -16,6 +16,7 @@
 @synthesize lineWidth;
 @synthesize shapeBezier;
 @synthesize lineColor;
+@synthesize objectID;
 
 NSString *ContentPointsKey = @"points";
 NSString *ContentLineWidthKey = @"lineWidth";
@@ -43,9 +44,13 @@ NSString *ContentLineColorKey = @"lineColor";
 - (id)initWithCoder: (NSCoder *)decoder {
     self = [super init];
     if( self ) {
-        self.lineColor = [[decoder decodeObjectForKey:ContentLineColorKey] retain];
-        self.points = [decoder decodeObjectForKey:ContentPointsKey];
-        if ( self.points ) {
+        if ( [decoder containsValueForKey:ContentLineColorKey] ) {
+            self.lineColor = [[decoder decodeObjectForKey:ContentLineColorKey] retain];
+        } else {
+            self.lineColor = [[NSColor blackColor] retain];
+        }
+        if ( [decoder containsValueForKey:ContentPointsKey] ) {
+            self.points = [decoder decodeObjectForKey:ContentPointsKey];
             self.lineWidth = [decoder decodeFloatForKey:ContentLineWidthKey];
             self.shapeBezier = [NSBezierPath bezierPath];
             [self.shapeBezier setLineWidth:self.lineWidth];
@@ -119,7 +124,7 @@ NSString *ContentLineColorKey = @"lineColor";
 }
 
 // ポリラインを描画する
-- (void)draw {
+- (void)draw:(BOOL)selected {
     // 色を設定
     [self.lineColor set];
 
@@ -148,30 +153,52 @@ NSString *ContentLineColorKey = @"lineColor";
 #endif
     [self.shapeBezier setLineWidth:self.lineWidth];
     [self.shapeBezier stroke];
+    if ( selected ) {
+        // 選択状態の場合は、各ポイントにマーカーを表示する
+        [[NSColor redColor] set];
+        for ( NSInteger index = 0; index < [self.shapeBezier elementCount]; index++ ) {
+            NSPoint controlPoint[3];
+            NSBezierPathElement element = [self.shapeBezier elementAtIndex:index
+                                           associatedPoints:&controlPoint[0]];
+            
+            [NSBezierPath fillRect:NSMakeRect( controlPoint[0].x - self.lineWidth / 2 - 2,
+                                               controlPoint[0].y - self.lineWidth / 2 - 2,
+                                               self.lineWidth + 4,
+                                               self.lineWidth + 4 )];
+        }
+    }
 }
 
 // ポリラインがクリックされたかどうか
-- (BOOL)hitTest:(NSPoint)point {
-    NSInteger pointCount = [self.shapeBezier elementCount];
-    float lineWidth = [self.shapeBezier lineWidth];
-    NSPoint prevPoint[3];
-    NSBezierPathElement element = [self.shapeBezier elementAtIndex:0
-                                   associatedPoints:&prevPoint[0]];
-    for ( NSInteger index = 1; index < pointCount; index++ ) {
-        NSPoint lineEnd[3];
+- (BOOL)clickCheck:(NSPoint)point {
+    float halfWidth = [self.shapeBezier lineWidth] / 2.0 + 2.5; // 若干余裕を持たせる
+    if ( NSPointInRect( point, NSInsetRect( [self.shapeBezier bounds], -halfWidth, -halfWidth ) ) ) {
+        NSInteger pointCount = [self.shapeBezier elementCount];
+        NSPoint prevPoint[3];
         NSBezierPathElement element = [self.shapeBezier elementAtIndex:0
-                                       associatedPoints:&lineEnd[0]];
-        float distance = [self calcDistance:point lineFrom:prevPoint[0] lineTo:lineEnd[0]];
-        if ( distance < lineWidth + 0.5 ) {
-            return YES;
+                                       associatedPoints:&prevPoint[0]];
+        for ( NSInteger index = 1; index < pointCount; index++ ) {
+            NSPoint lineEnd[3];
+            NSBezierPathElement element = [self.shapeBezier elementAtIndex:index
+                                           associatedPoints:&lineEnd[0]];
+            float distance = [self calcDistance:point lineFrom:prevPoint[0] lineTo:lineEnd[0]];
+            if ( distance < halfWidth ) {
+                return YES;
+            }
+            prevPoint[0] = lineEnd[0];
         }
     }
     return NO;
 }
 
-// 直線と点の間の距離を計算
+// 線分と点の間の距離を計算
 - (float)calcDistance:(NSPoint)point lineFrom:(NSPoint)lineStart lineTo:(NSPoint)lineEnd {
-    float v1 = fabs( ( lineStart.y - lineEnd.y ) * point.x - ( lineStart.x - lineStart.x ) * point.y + lineStart.x * lineEnd.y - lineEnd.x * lineStart.y );
+    NSRect lineRect = NSMakeRect( fmin( lineStart.x, lineEnd.x ), fmin( lineStart.y, lineEnd.y ),
+                                  fabs( lineStart.x - lineEnd.x ), fabs( lineStart.y - lineEnd.y ) );
+    if ( !NSPointInRect( point, lineRect ) ) {
+        return 1.0e10;
+    }
+    float v1 = fabs( ( lineStart.y - lineEnd.y ) * point.x - ( lineStart.x - lineEnd.x ) * point.y + lineStart.x * lineEnd.y - lineEnd.x * lineStart.y );
     float v2 = sqrt( pow( lineStart.y - lineEnd.y, 2.0 ) + pow( lineStart.x - lineEnd.x, 2.0 ) );
     return v1 / v2;
 }

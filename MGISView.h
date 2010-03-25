@@ -28,6 +28,10 @@ typedef enum {
     ModeCreatingPolyline,
     ModeCreatingPolygon,
     ModeCreatingText,
+    ModeEditingPoint,
+    ModeEditingPolyline,
+    ModeEditingpolygon,
+    ModeEditingText,
 } EditingMode;
 
 #define MAP_IMAGE_WIDTH  640.0
@@ -92,6 +96,8 @@ typedef enum {
     NSPoint	_ctrlPoint2;
 
     MGISPolyline *creatingPolyline;
+    NSMutableArray *shapes;
+    MGISPolyline *selectedPolyline;
 }
 
 - (void) setupDefaults;
