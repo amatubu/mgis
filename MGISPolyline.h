@@ -13,15 +13,19 @@
     NSRect bounds;
     NSMutableArray *points;
     CGFloat lineWidth;
+    NSBezierPath *shapeBezier;
     NSColor *lineColor;
 }
 
 - (void) addPoint:(NSPoint)aPoint;
 - (void) draw;
+- (BOOL) hitTest:(NSPoint)point;
+- (float) calcDistance:(NSPoint)point lineFrom:(NSPoint)lineStart lineTo:(NSPoint)lineEnd;
 
 @property NSRect bounds;
 @property (retain) NSMutableArray *points;
 @property CGFloat lineWidth;
+@property (retain) NSBezierPath *shapeBezier;
 @property (retain) NSColor *lineColor;
 
 @end

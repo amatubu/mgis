@@ -188,12 +188,7 @@
     NSManagedObject *object = [[NSManagedObject alloc] initWithEntity:entity
                                        insertIntoManagedObjectContext:context];
     // 図形を設定する
-    NSError *error;
-    if ( [object validateValue:&aPolyline forKey:@"shape" error:&error] ) {
-        [object setValue:aPolyline forKey:@"shape"];
-    } else {
-        NSLog( @"Error %@ returned from validateValue:forKey:error", error );
-    }
+    [object setValue:aPolyline forKey:@"shape"];
     
     // レイヤーの設定をする
     // TODO:
@@ -210,6 +205,7 @@
     
     // 作成したオブジェクトを追加する
     [context insertObject:object];
+    [request release];
     
     // 設定パネルを閉じる
     [self.shapeParamPanel orderOut:self];

@@ -364,7 +364,7 @@ static int	RADIUS = 4;
 	mousePoint = [event locationInWindow];
 	
 //    NSLog( @"click count %d", [event clickCount] );
-    if ( dragging ) {
+    if ( self.dragging ) {
         // ドラッグ終了
         self.dragging = NO;
         [self setNeedsDisplay:YES];
@@ -558,6 +558,7 @@ static int	RADIUS = 4;
     float width = [lineWidth intValue];
     if ( self.editingMode == ModeCreatePolyline || self.editingMode == ModeCreatingPolyline ) {
         creatingPolyline.lineWidth = width;
+        [creatingPolyline.shapeBezier setLineWidth:width];
         [self setNeedsDisplay:YES];
     }
 }
