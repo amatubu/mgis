@@ -89,12 +89,6 @@ typedef enum {
 
 	CoordinateConverter *converter;
 	
-	// for content test
-    NSPoint	_startPoint;
-    NSPoint	_endPoint;
-    NSPoint	_ctrlPoint1;
-    NSPoint	_ctrlPoint2;
-
     MGISPolyline *creatingPolyline;
     NSMutableArray *shapes;
     MGISPolyline *selectedPolyline;

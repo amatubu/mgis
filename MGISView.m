@@ -223,8 +223,13 @@ static int	RADIUS = 4;
             MGISPolyline *polyline = [NSKeyedUnarchiver unarchiveObjectWithData:shape];
             if ( polyline ) {
                 polyline.objectID = [aObject objectID];
-                [polyline draw:(polyline.objectID == selectedPolyline.objectID)];
-                [shapes addObject:[polyline retain]];
+                if ( selectedPolyline && ( polyline.objectID == selectedPolyline.objectID ) ) {
+                    [selectedPolyline draw:YES];
+                    [shapes addObject:[selectedPolyline retain]];
+                } else {
+                    [polyline draw:NO];
+                    [shapes addObject:[polyline retain]];
+                }
             }
         }
     }
@@ -234,21 +239,6 @@ static int	RADIUS = 4;
 
     // 画面上に描かれた図形編集のイメージ
     NSBezierPath *bezier = [NSBezierPath bezierPath];
-    
-    // Draw curve
-    [[NSColor blackColor] set];
-    [bezier moveToPoint:_startPoint];
-    [bezier curveToPoint:_endPoint controlPoint1:_ctrlPoint1 controlPoint2:_ctrlPoint2];
-    [bezier stroke];
-    
-    // Draw control points
-    [[[NSColor redColor] colorWithAlphaComponent:0.7] set];
-    [NSBezierPath fillRect:makeControlRect(_startPoint)];
-    [NSBezierPath fillRect:makeControlRect(_endPoint)];
-    [[NSBezierPath bezierPathWithOvalInRect:makeControlRect(_ctrlPoint1)] fill];
-    [[NSBezierPath bezierPathWithOvalInRect:makeControlRect(_ctrlPoint2)] fill];
-    [NSBezierPath strokeLineFromPoint:_startPoint toPoint:_ctrlPoint1];
-    [NSBezierPath strokeLineFromPoint:_endPoint toPoint:_ctrlPoint2];
 
     // ポリラインコンテンツ
     if ( self.editingMode == ModeCreatingPolyline ) {
@@ -260,7 +250,6 @@ static int	RADIUS = 4;
 // 地図をスクロールさせるための事前準備として、ボタンが押された座標を記録しておく
 - (void) mouseDown: (NSEvent *) event
 {
-    NSPoint*	targetedPoint = NULL;
     NSPoint		locationInWindow = [event locationInWindow];
     
     if ( [event clickCount] == 2 ) {
@@ -297,35 +286,30 @@ static int	RADIUS = 4;
         }
     }
     
-    // コンテンツの上でクリックされたかどうかを調べる
-    // TODO:
-    //   地図上の座標で調べる必要がある
-    selectedPolyline = nil;
-    for ( NSInteger index = 0; index < [shapes count]; index++ ) {
-        if ( [[shapes objectAtIndex:index] clickCheck:locationInWindow] ) {
-            NSLog( @"mouse %f, %f hits %d th object", locationInWindow.x, locationInWindow.y, index );
-            // 選択
-            // TODO:
-            //   mouseUp で、ドラッグでない場合に処理するべき
-            selectedPolyline = [shapes objectAtIndex:index];
-            break;
+    // コントロールポイント上でクリックされたかどうかを調べる
+    NSInteger index = -1;
+    if ( selectedPolyline ) {
+        index = [selectedPolyline clickedControlPoint:locationInWindow];
+    }
+    
+    if ( index == -1 ) {
+        // コンテンツの上でクリックされたかどうかを調べる
+        // TODO:
+        //   地図上の座標で調べる必要がある
+        selectedPolyline = nil;
+        for ( NSInteger index = 0; index < [shapes count]; index++ ) {
+            if ( [[shapes objectAtIndex:index] clickCheck:locationInWindow] ) {
+                NSLog( @"mouse %f, %f hits %d th object", locationInWindow.x, locationInWindow.y, index );
+                // 選択
+                // TODO:
+                //   mouseUp で、ドラッグでない場合に処理するべき
+                selectedPolyline = [shapes objectAtIndex:index];
+                break;
+            }
         }
     }
     
-    if(NSPointInRect(locationInWindow, makeControlRect(_startPoint))) {
-        targetedPoint = &_startPoint;
-    }
-    else if(NSPointInRect(locationInWindow, makeControlRect(_endPoint))) {
-        targetedPoint = &_endPoint;
-    }
-    else if(NSPointInRect(locationInWindow, makeControlRect(_ctrlPoint1))) {
-        targetedPoint = &_ctrlPoint1;
-    }
-    else if(NSPointInRect(locationInWindow, makeControlRect(_ctrlPoint2))) {
-        targetedPoint = &_ctrlPoint2;
-    }
-    
-    if ( targetedPoint == NULL ) {
+    if ( index == -1 ) {
         if ( self.editingMode == ModeViewingMap ) {
             // マウスボタンが押された座標を記録しておく
             self.grabOrigin = [event locationInWindow];
@@ -349,8 +333,8 @@ static int	RADIUS = 4;
 		}
         
         // Update targetedPoint
-        *targetedPoint = [evt locationInWindow];
-		NSLog(@"target: %f, %f, %d", targetedPoint->x, targetedPoint->y, [evt type ]);
+        NSPoint targetedPoint = [evt locationInWindow];
+        [selectedPolyline moveControlPointTo:targetedPoint atIndex:index];
         
         // Re-display itself
         [self setNeedsDisplay:YES];
@@ -745,12 +729,6 @@ static int	RADIUS = 4;
 // 各種初期化
 - (void)awakeFromNib
 {
-    // Initialize
-    _startPoint.x = 50;		_startPoint.y = 100;
-    _endPoint.x = 200;		_endPoint.y = 100;
-    _ctrlPoint1.x = 100;	_ctrlPoint1.y = 150;
-    _ctrlPoint2.x = 150;	_ctrlPoint2.y = 150;
-
     // 設定ファイルから中心位置を読み込む
     NSNumber *temp = [[userPrefs values] valueForKey:@"center_x"];
     if ( temp ) {

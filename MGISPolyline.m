@@ -191,6 +191,31 @@ NSString *ContentLineColorKey = @"lineColor";
     return NO;
 }
 
+// ポリラインのコントロールポイントがクリックされたかどうか
+- (NSInteger)clickedControlPoint:(NSPoint)point {
+    float halfWidth = [self.shapeBezier lineWidth] / 2.0 + 2.5; // 若干余裕を持たせる
+    if ( NSPointInRect( point, NSInsetRect( [self.shapeBezier bounds], -halfWidth, -halfWidth ) ) ) {
+        NSInteger pointCount = [self.shapeBezier elementCount];
+        for ( NSInteger index = 1; index < pointCount; index++ ) {
+            NSPoint controlPoint[3];
+            NSBezierPathElement element = [self.shapeBezier elementAtIndex:index
+                                           associatedPoints:&controlPoint[0]];
+            if ( NSPointInRect( point, NSMakeRect( controlPoint[0].x - self.lineWidth / 2 - 2,
+                                                   controlPoint[0].y - self.lineWidth / 2 - 2,
+                                                   self.lineWidth + 4,
+                                                   self.lineWidth + 4 ) ) ) {
+                return index;
+            }
+        }
+    }
+    return -1;
+}
+
+// ポリラインのコントロールポイントを動かす
+- (void)moveControlPointTo:(NSPoint)point atIndex:(NSInteger)index {
+    [self.shapeBezier setAssociatedPoints:&point atIndex:index];
+}
+
 // 線分と点の間の距離を計算
 - (float)calcDistance:(NSPoint)point lineFrom:(NSPoint)lineStart lineTo:(NSPoint)lineEnd {
     NSRect lineRect = NSMakeRect( fmin( lineStart.x, lineEnd.x ), fmin( lineStart.y, lineEnd.y ),

@@ -21,6 +21,8 @@
 - (void) addPoint:(NSPoint)aPoint;
 - (void) draw:(BOOL)selected;
 - (BOOL) clickCheck:(NSPoint)point;
+- (NSInteger) clickedControlPoint:(NSPoint)point;
+- (void) moveControlPointTo:(NSPoint)point atIndex:(NSInteger)index;
 - (float) calcDistance:(NSPoint)point lineFrom:(NSPoint)lineStart lineTo:(NSPoint)lineEnd;
 
 @property NSRect bounds;
