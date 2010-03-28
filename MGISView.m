@@ -10,8 +10,6 @@
 #import "ContentsObject.h"
 
 
-static int	RADIUS = 4;
-
 @implementation MGISView
 
 @synthesize center_x;
@@ -312,15 +310,18 @@ static int	RADIUS = 4;
     }
     
     // Track mouse dragging
-    while(1) {
-        NSEvent *evt = [NSApp nextEventMatchingMask:(NSLeftMouseDraggedMask | NSLeftMouseUpMask) untilDate:nil inMode:NSEventTrackingRunLoopMode dequeue:YES];
+    while( 1 ) {
+        NSEvent *evt = [NSApp nextEventMatchingMask:(NSLeftMouseDraggedMask | NSLeftMouseUpMask)
+                                          untilDate:nil
+                                             inMode:NSEventTrackingRunLoopMode
+                                            dequeue:YES];
         
-        if([evt type] == NSLeftMouseUp) {
+        if( [evt type] == NSLeftMouseUp ) {
             break;
         }
-		if([evt type] == 0) {
-			continue;
-		}
+        if( [evt type] == 0 ) {
+            continue;
+        }
         
         // Update targetedPoint
         NSPoint targetedPoint = [evt locationInWindow];
@@ -515,10 +516,10 @@ static int	RADIUS = 4;
 - (void) drawCenterMarker: (NSRect)viewRect {
 	[[NSColor redColor] set];
 	NSRect r;
-	r= NSMakeRect( viewRect.size.width / 2.0 - 1.0,
-                   viewRect.size.height / 2.0 - 10.0,
-                    2.0,
-                   20.0 );
+	r = NSMakeRect( viewRect.size.width / 2.0 - 1.0,
+                    viewRect.size.height / 2.0 - 10.0,
+                     2.0,
+                    20.0 );
 	NSRectFill(r);
 	r = NSMakeRect( viewRect.size.width / 2.0 - 10.0,
                     viewRect.size.height / 2.0 - 1.0,
@@ -829,11 +830,6 @@ static int	RADIUS = 4;
     
     // ウィンドウをアクティブにする
     [[self window] makeKeyAndOrderFront:self];
-}
-
-NSRect makeControlRect(NSPoint controlPoint)
-{
-    return NSMakeRect(controlPoint.x - RADIUS, controlPoint.y - RADIUS, RADIUS * 2, RADIUS * 2);
 }
 
 

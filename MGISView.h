@@ -143,4 +143,3 @@ typedef enum {
 @property (retain) CoordinateConverter *converter;
 @end
 
-NSRect makeControlRect(NSPoint controlPoint);
