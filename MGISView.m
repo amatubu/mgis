@@ -171,6 +171,28 @@
 	[self.offscreenImage compositeToPoint:NSMakePoint( x_offset, y_offset )
 						        operation:NSCompositeSourceOver];
 	
+    // コンテンツを表示する際に使用するアフィン変換
+    NSAffineTransform *mapToScreenTransform = [NSAffineTransform transform];
+    [mapToScreenTransform translateXBy:-self.center_x/meterPerPixel
+                                   yBy:-self.center_y/meterPerPixel];
+    [mapToScreenTransform translateXBy:+[self bounds].size.width / 2.0
+                                   yBy:+[self bounds].size.height / 2.0];
+    [mapToScreenTransform scaleBy:1 / meterPerPixel];
+    
+    // テスト
+    NSBezierPath *testBezier = [NSBezierPath bezierPathWithRect:NSMakeRect( center_x - 100,
+                                                                            center_y - 100,
+                                                                            200,
+                                                                            200 )];
+    [testBezier setLineWidth:3.0];
+    [testBezier transformUsingAffineTransform:mapToScreenTransform];
+    NSPoint controlPoint[3];
+    for ( NSInteger index = 0; index < [testBezier elementCount]; index++ ) {
+        NSBezierPathElement element = [testBezier elementAtIndex:index
+                                                associatedPoints:&controlPoint[0]];
+    }
+    [testBezier stroke];
+    
     // 地図上のコンテンツの描画
     // クリックテストに利用するコンテンツリスト
 //    [shapes release];
@@ -309,7 +331,7 @@
         return;
     }
     
-    // Track mouse dragging
+    // コントロールポイントのドラッグ処理
     while( 1 ) {
         NSEvent *evt = [NSApp nextEventMatchingMask:(NSLeftMouseDraggedMask | NSLeftMouseUpMask)
                                           untilDate:nil
@@ -323,11 +345,11 @@
             continue;
         }
         
-        // Update targetedPoint
+        // コントロールポイントを更新
         NSPoint targetedPoint = [evt locationInWindow];
         [selectedPolyline moveControlPointTo:targetedPoint atIndex:index];
         
-        // Re-display itself
+        // 再描画
         [self setNeedsDisplay:YES];
     }
 } // mouseDown
