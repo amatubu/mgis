@@ -222,9 +222,7 @@
 // ポリラインを設定する
 - (void) setPolylineContent:(NSData *)aPolyline atObjectID:(NSManagedObjectID *)objectID {
     NSManagedObjectContext *context = [self managedObjectContext];
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Contents"
-                                              inManagedObjectContext:context];
-    
+
     // ポリラインを設定する
     NSManagedObject *object = [context objectWithID:objectID];
     [object setValue:aPolyline forKey:@"shape"];
