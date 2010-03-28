@@ -199,7 +199,7 @@ static int	RADIUS = 4;
 	[request setPredicate:predicate];
     
 	// 取り出す最大数
-	[request setFetchLimit:10];
+	[request setFetchLimit:50];
 	
 	// フェッチ
 	NSError *error;
@@ -290,6 +290,8 @@ static int	RADIUS = 4;
                 //   mouseUp で、ドラッグでない場合に処理するべき
                 selectedPolyline = [shapes objectAtIndex:index];
                 self.editingMode = ModeEditingPolyline;
+                [lineWidth setIntValue:selectedPolyline.lineWidth];
+                [lineColor setColor:selectedPolyline.lineColor];
                 [contentObject showShapePanel];
                 [self setNeedsDisplay:YES];
                 break;
