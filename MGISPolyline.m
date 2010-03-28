@@ -196,7 +196,7 @@ NSString *ContentLineColorKey = @"lineColor";
     float halfWidth = [self.shapeBezier lineWidth] / 2.0 + 2.5; // 若干余裕を持たせる
     if ( NSPointInRect( point, NSInsetRect( [self.shapeBezier bounds], -halfWidth, -halfWidth ) ) ) {
         NSInteger pointCount = [self.shapeBezier elementCount];
-        for ( NSInteger index = 1; index < pointCount; index++ ) {
+        for ( NSInteger index = 0; index < pointCount; index++ ) {
             NSPoint controlPoint[3];
             NSBezierPathElement element = [self.shapeBezier elementAtIndex:index
                                            associatedPoints:&controlPoint[0]];

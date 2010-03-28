@@ -19,6 +19,9 @@
     NSPersistentStoreCoordinator *persistentStoreCoordinator;
     NSManagedObjectModel *managedObjectModel;
     NSManagedObjectContext *managedObjectContext;
+
+    NSArrayController *contentArray;
+    NSArrayController *layerArray;
 }
 
 @property (nonatomic, retain) IBOutlet NSWindow *window;
@@ -29,6 +32,9 @@
 @property (nonatomic, retain, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 @property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, retain, readonly) NSManagedObjectContext *managedObjectContext;
+
+@property (nonatomic, retain) IBOutlet NSArrayController *contentArray;
+@property (nonatomic, retain) IBOutlet NSArrayController *layerArray;
 
 - (IBAction) saveAction:sender;
 - (IBAction) showListWindow:(id)sender;
@@ -43,5 +49,8 @@
 - (IBAction) createTextContent:(id)sernder;
 
 - (void) insertPolylineContent:(NSData *)aPolyline;
+- (void) setPolylineContent:(NSData *)aPolyline atObjectID:(NSManagedObjectID *)objectID;
+- (void) showShapePanel;
+- (void) closeShapePanel;
 
 @end

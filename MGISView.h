@@ -114,6 +114,8 @@ typedef enum {
 - (IBAction) changeMapFormat:(id)sender;
 - (IBAction) changeLineWidth:(id)sender;
 - (IBAction) changeLineColor:(id)sender;
+- (IBAction) cancelEditing:(id)sender;
+- (IBAction) finishEditing:(id)sender;
 
 @property float center_x;
 @property float center_y;

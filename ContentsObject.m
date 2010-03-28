@@ -15,6 +15,8 @@
 @synthesize detailWindow;
 @synthesize mgisView;
 @synthesize shapeParamPanel;
+@synthesize contentArray;
+@synthesize layerArray;
 
 /**
  Returns the support directory for the application, used to store the Core Data
@@ -166,8 +168,7 @@
 - (IBAction) createPolylineContent:(id)sender {
 	NSLog( @"createPolylineContent %@", sender );
     mgisView.editingMode = ModeCreatePolyline;
-    [shapeParamPanel makeKeyAndOrderFront:self];
-    [[mgisView window] makeKeyAndOrderFront:self];
+    [self showShapePanel];
 }
 
 - (IBAction) createPolygonContent:(id)sender {
@@ -203,17 +204,44 @@
     NSManagedObject *layerObject = [layerObjects objectAtIndex:0];
     [object setValue:layerObject forKey:@"layer"];
     
+//    [contentArray setSelectionIndex:[contentArray count]];
+    
     // 作成したオブジェクトを追加する
     [context insertObject:object];
     [request release];
     
     // 設定パネルを閉じる
-    [self.shapeParamPanel orderOut:self];
+    [self closeShapePanel];
     
     // 詳細ウィンドウをアクティブに
     // TODO:
     //   その前に、追加したデータを選択してやる必要がある
     [self.detailWindow makeKeyAndOrderFront:self];
+}
+
+// ポリラインを設定する
+- (void) setPolylineContent:(NSData *)aPolyline atObjectID:(NSManagedObjectID *)objectID {
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Contents"
+                                              inManagedObjectContext:context];
+    
+    // ポリラインを設定する
+    NSManagedObject *object = [context objectWithID:objectID];
+    [object setValue:aPolyline forKey:@"shape"];
+    
+    // 設定パネルを閉じる
+    [self closeShapePanel];
+}
+
+// 設定パネルを表示させる
+- (void) showShapePanel {
+    [self.shapeParamPanel makeKeyAndOrderFront:self];
+    [[mgisView window] makeKeyAndOrderFront:self];
+}
+
+// 設定パネルを閉じる
+- (void) closeShapePanel {
+    [self.shapeParamPanel orderOut:self];
 }
 
 /**
