@@ -12,7 +12,6 @@
 @implementation MGISPolyline
 
 @synthesize bounds;
-@synthesize points;
 @synthesize lineWidth;
 @synthesize shapeBezier;
 @synthesize lineColor;
@@ -31,7 +30,6 @@ NSString *ContentLineColorKey = @"lineColor";
         
         // Set up decent defaults for a new graphic.
         self.bounds = NSZeroRect;
-        self.points = [[NSMutableArray alloc] init];
         self.lineColor = [[NSColor blackColor] retain];
         self.shapeBezier = [NSBezierPath bezierPath];
         [self.shapeBezier setLineWidth:3.0f];
@@ -50,42 +48,28 @@ NSString *ContentLineColorKey = @"lineColor";
             self.lineColor = [[NSColor blackColor] retain];
         }
         if ( [decoder containsValueForKey:ContentPointsKey] ) {
-            self.points = [decoder decodeObjectForKey:ContentPointsKey];
+            NSArray *points = [decoder decodeObjectForKey:ContentPointsKey];
             self.lineWidth = [decoder decodeFloatForKey:ContentLineWidthKey];
             self.shapeBezier = [NSBezierPath bezierPath];
             [self.shapeBezier setLineWidth:self.lineWidth];
 
             // bounds と bezierPath は読み込んだデータから作る
-            CGFloat left = 1e100, right = -1e100, top = -1e100, bottom = 1e100;
-            for ( NSInteger index = 0; index < [self.points count]; index++ ) {
-                // NSValue *pointObject = [self.points objectAtIndex:index];
-                // NSPoint point = [pointObject pointValue];
-                NSString *pointString = [self.points objectAtIndex:index];
+            for ( NSInteger index = 0; index < [points count]; index++ ) {
+                NSString *pointString = [points objectAtIndex:index];
                 NSPoint point = NSPointFromString( pointString );
-                left = fmin( left, point.x );
-                right = fmax( right, point.x );
-                bottom = fmin( bottom, point.y );
-                top = fmax( top, point.y );
                 if ( index == 0 ) {
                     [self.shapeBezier moveToPoint:point];
                 } else {
                     [self.shapeBezier lineToPoint:point];
                 }
             }
-            self.bounds = NSMakeRect( left, bottom, right - left, top - bottom );
+            self.bounds = [self.shapeBezier bounds];
             
         } else {
             self.shapeBezier = [[decoder decodeObjectForKey:ContentShapeBezierKey] retain];
             // bounds は読み込んだデータから作る
             self.bounds = [self.shapeBezier bounds];
             self.lineWidth = [self.shapeBezier lineWidth];
-            self.points = [[NSMutableArray alloc] init];
-            NSPoint controlPoints[3];
-            for (NSInteger index = 0; index < [self.shapeBezier elementCount]; index++ ) {
-                NSBezierPathElement element = [self.shapeBezier elementAtIndex:index
-                                               associatedPoints:&controlPoints[0]];
-                [self.points addObject:NSStringFromPoint( controlPoints[0] )];
-            }
         }
     }
     return self;
@@ -104,7 +88,6 @@ NSString *ContentLineColorKey = @"lineColor";
     
     // Do the regular Cocoa thing.
     [self.lineColor release];
-    [self.points release];
 //    [self.shapeBezier release];
     [super dealloc];
     
@@ -112,15 +95,11 @@ NSString *ContentLineColorKey = @"lineColor";
 
 // ポイントを追加する
 - (void)addPoint:(NSPoint)aPoint {
-//    NSValue *aValue = [NSValue valueWithPoint:aPoint];
-    if ( [self.points count] == 0 ) {
+    if ( [self.shapeBezier elementCount] == 0 ) {
         [self.shapeBezier moveToPoint:aPoint];
     } else {
         [self.shapeBezier lineToPoint:aPoint];
     }
-    NSString *aValue = NSStringFromPoint( aPoint );
-    [self.points addObject:aValue];
-//    [aValue release];
 }
 
 // ポリラインを描画する
@@ -131,26 +110,6 @@ NSString *ContentLineColorKey = @"lineColor";
     // ポリラインのベジエパスを得る
     // TODO:
     //   地図上の位置から変換する必要がある
-#if 0
-    NSBezierPath *polyBezier = [NSBezierPath bezierPath];
-    [polyBezier setLineWidth:self.lineWidth];
-    NSInteger pointCount = [self.points count];
-    for ( NSInteger index = 0; index < pointCount; index++ ) {
-//        NSValue *pointObject = [self.points objectAtIndex:index];
-//        NSPoint point = [pointObject pointValue];
-        NSString *pointString = [self.points objectAtIndex:index];
-        NSPoint point = NSPointFromString( pointString );
-        if ( index == 0 ) {
-            [polyBezier moveToPoint:point];
-        } else {
-            [polyBezier lineToPoint:point];
-        }
-//        [NSBezierPath strokeLineFromPoint:_endPoint toPoint:_ctrlPoint2];
-    }
-    
-    // ベジエパスを描画
-    [polyBezier stroke];
-#endif
     [self.shapeBezier setLineWidth:self.lineWidth];
     [self.shapeBezier stroke];
     if ( selected ) {

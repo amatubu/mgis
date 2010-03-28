@@ -11,7 +11,6 @@
 
 @interface MGISPolyline : NSObject <NSCoding> {
     NSRect bounds;
-    NSMutableArray *points;
     CGFloat lineWidth;
     NSBezierPath *shapeBezier;
     NSColor *lineColor;
@@ -26,7 +25,6 @@
 - (float) calcDistance:(NSPoint)point lineFrom:(NSPoint)lineStart lineTo:(NSPoint)lineEnd;
 
 @property NSRect bounds;
-@property (retain) NSMutableArray *points;
 @property CGFloat lineWidth;
 @property (retain) NSBezierPath *shapeBezier;
 @property (retain) NSColor *lineColor;
