@@ -173,11 +173,11 @@
 	
     // コンテンツを表示する際に使用するアフィン変換
     NSAffineTransform *mapToScreenTransform = [NSAffineTransform transform];
-    [mapToScreenTransform translateXBy:-self.center_x/meterPerPixel
-                                   yBy:-self.center_y/meterPerPixel];
     [mapToScreenTransform translateXBy:+[self bounds].size.width / 2.0
                                    yBy:+[self bounds].size.height / 2.0];
     [mapToScreenTransform scaleBy:1 / meterPerPixel];
+    [mapToScreenTransform translateXBy:-self.center_x
+                                   yBy:-self.center_y];
     
     // テスト
     NSBezierPath *testBezier = [NSBezierPath bezierPathWithRect:NSMakeRect( center_x - 100,
