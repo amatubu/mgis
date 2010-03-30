@@ -174,20 +174,6 @@
     // コンテンツを表示する際に使用するアフィン変換
     NSAffineTransform *mapToScreenTransform = [self mapToScreenTransform];
     
-    // テスト
-    NSBezierPath *testBezier = [NSBezierPath bezierPathWithRect:NSMakeRect( center_x - 100,
-                                                                            center_y - 100,
-                                                                            200,
-                                                                            200 )];
-    [testBezier setLineWidth:3.0];
-    [testBezier transformUsingAffineTransform:mapToScreenTransform];
-    NSPoint controlPoint[3];
-    for ( NSInteger index = 0; index < [testBezier elementCount]; index++ ) {
-        NSBezierPathElement element = [testBezier elementAtIndex:index
-                                                associatedPoints:&controlPoint[0]];
-    }
-    [testBezier stroke];
-    
     // 地図上のコンテンツの描画
     // クリックテストに利用するコンテンツリスト
     [shapes release];
