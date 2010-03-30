@@ -197,7 +197,7 @@
     //   レイヤーが存在しなかった場合のエラー処理
     NSEntityDescription *layerEntity = [NSEntityDescription entityForName:@"Layers"
                                                    inManagedObjectContext:context];
-    NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
     [request setEntity:layerEntity];
     [request setFetchLimit:1];
     NSArray *layerObjects = [context executeFetchRequest:request error:nil];
