@@ -70,8 +70,6 @@ typedef enum {
 	float center_x;
 	float center_y;
 
-	BOOL first_draw;
-
 	BOOL dragging;
     NSPoint grabOrigin;
 
@@ -129,7 +127,6 @@ typedef enum {
 @property (retain) id info_longitude;
 @property (retain) id infoWindow;
 @property (retain) id scale;
-@property BOOL first_draw;
 @property BOOL dragging;
 @property NSPoint grabOrigin;
 @property (retain) NSImage *offscreenImage;

@@ -22,7 +22,6 @@
 @synthesize info_longitude;
 @synthesize infoWindow;
 @synthesize scale;
-@synthesize first_draw;
 @synthesize dragging;
 @synthesize grabOrigin;
 @synthesize offscreenImage;
@@ -53,9 +52,6 @@
 		self.center_x = 46665.476f;
 		self.center_y = -140941.652f;
 
-		// 最初の描画
-		self.first_draw = YES;
-		
 		// 地図のフォーマット(拡張子)
 		self.map_suffix = @".jpg";
 		
@@ -104,16 +100,6 @@
 // 描画ルーチン
 // ビューの内容を更新する必要が生じた際に呼ばれる
 - (void)drawRect:(NSRect)rect {
-	if ( first_draw ) {
-		// ズームレベルや地図形式を初期化する
-		[self changeZoomLevel:zoomSlider];
-		[self changeMapFormat:mapFormat];
-		// 情報ウィンドウやスケールの内容を更新する
-		[self updateInfoWindow];
-		[self updateScaleText];
-		self.first_draw = NO;
-	}
-
     // 地図の描画
 	// ズームレベルによって異なる定数を変数に保存しておく
 	float meterPerPixel = [self getMeterPerPixel];
@@ -875,6 +861,14 @@
     temp = [NSNumber numberWithFloat:self.center_y];
     [[userPrefs values] setValue:temp forKey:@"center_y"];
     
+    // ズームレベルや地図形式を初期化する
+    [self changeZoomLevel:zoomSlider];
+    [self changeMapFormat:mapFormat];
+    
+    // 情報ウィンドウやスケールの内容を更新する
+    [self updateInfoWindow];
+    [self updateScaleText];
+
     // ウィンドウをアクティブにする
     [[self window] makeKeyAndOrderFront:self];
 }
