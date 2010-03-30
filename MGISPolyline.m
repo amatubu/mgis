@@ -117,7 +117,8 @@ NSString *ContentLineColorKey = @"lineColor";
             NSPoint controlPoint[3];
             NSBezierPathElement element = [self.shapeBezier elementAtIndex:index
                                            associatedPoints:&controlPoint[0]];
-            
+            if ( element != NSMoveToBezierPathElement && element != NSLineToBezierPathElement ) continue;
+
             [NSBezierPath fillRect:NSMakeRect( controlPoint[0].x - self.lineWidth / 2 - 2,
                                                controlPoint[0].y - self.lineWidth / 2 - 2,
                                                self.lineWidth + 4,
@@ -134,10 +135,13 @@ NSString *ContentLineColorKey = @"lineColor";
         NSPoint prevPoint[3];
         NSBezierPathElement element = [self.shapeBezier elementAtIndex:0
                                        associatedPoints:&prevPoint[0]];
+        NSLog( @"Start element %d", element );
         for ( NSInteger index = 1; index < pointCount; index++ ) {
             NSPoint lineEnd[3];
             NSBezierPathElement element = [self.shapeBezier elementAtIndex:index
                                            associatedPoints:&lineEnd[0]];
+            if ( element != NSLineToBezierPathElement ) continue;
+
             float distance = [self calcDistance:point lineFrom:prevPoint[0] lineTo:lineEnd[0]];
             if ( distance < halfWidth ) {
                 return YES;
@@ -157,6 +161,8 @@ NSString *ContentLineColorKey = @"lineColor";
             NSPoint controlPoint[3];
             NSBezierPathElement element = [self.shapeBezier elementAtIndex:index
                                            associatedPoints:&controlPoint[0]];
+            if ( element != NSMoveToBezierPathElement && element != NSLineToBezierPathElement ) continue;
+
             if ( NSPointInRect( point, NSMakeRect( controlPoint[0].x - self.lineWidth / 2 - 2,
                                                    controlPoint[0].y - self.lineWidth / 2 - 2,
                                                    self.lineWidth + 4,
