@@ -105,6 +105,8 @@ typedef enum {
 - (float) getMeterPerPixel;
 - (float) getMapWidth;
 - (float) getMapHeight;
+- (NSAffineTransform *) mapToScreenTransform;
+- (NSAffineTransform *) screenToMapTransform;
 - (void) updateInfoWindow;
 - (void) updateScaleText;
 - (void) drawCenterMarker: (NSRect)viewRect;

@@ -172,12 +172,7 @@
 						        operation:NSCompositeSourceOver];
 	
     // コンテンツを表示する際に使用するアフィン変換
-    NSAffineTransform *mapToScreenTransform = [NSAffineTransform transform];
-    [mapToScreenTransform translateXBy:+[self bounds].size.width / 2.0
-                                   yBy:+[self bounds].size.height / 2.0];
-    [mapToScreenTransform scaleBy:1 / meterPerPixel];
-    [mapToScreenTransform translateXBy:-self.center_x
-                                   yBy:-self.center_y];
+    NSAffineTransform *mapToScreenTransform = [self mapToScreenTransform];
     
     // テスト
     NSBezierPath *testBezier = [NSBezierPath bezierPathWithRect:NSMakeRect( center_x - 100,
@@ -195,7 +190,8 @@
     
     // 地図上のコンテンツの描画
     // クリックテストに利用するコンテンツリスト
-//    [shapes release];
+    [shapes release];
+    shapes = nil;
     shapes = [[NSMutableArray alloc] init];
     
 	// コンテクストを得る
@@ -231,7 +227,7 @@
 //        NSNumber *layer = [aObject valueForKey:@"layer"];
 //        NSLog( @"layer %@", layer );
         NSString *name = [aObject valueForKey:@"name"];
-        NSLog( @"name %@", name );
+        NSLog( @"index %d, name %@, objectID %@", index, name, [aObject objectID] );
         
         // ポリラインの描画
         // TODO:
@@ -240,10 +236,15 @@
         //   画面外のものは描画する必要なし
         NSData *shape = [aObject valueForKey:@"shape"];
         if ( shape ) {
+//            NSLog( @"  has shape" );
             MGISPolyline *polyline = [NSKeyedUnarchiver unarchiveObjectWithData:shape];
             if ( polyline ) {
+//                NSLog( @"  has polyline %@", polyline );
                 polyline.objectID = [aObject objectID];
+                // ベジエパスを画面上の座標に変換する
+                [polyline.shapeBezier transformUsingAffineTransform:mapToScreenTransform];
                 if ( selectedPolyline && ( polyline.objectID == selectedPolyline.objectID ) ) {
+//                    NSLog( @"  is selected" );
                     [selectedPolyline draw:YES];
                     [shapes addObject:[selectedPolyline retain]];
                 } else {
@@ -291,6 +292,9 @@
         return;
     }
     
+    if ( self.editingMode == ModeCreatingPolyline || self.editingMode == ModeCreatePolyline )
+        return;
+    
     // コントロールポイント上でクリックされたかどうかを調べる
     NSInteger index = -1;
     if ( selectedPolyline ) {
@@ -299,9 +303,8 @@
     
     if ( index == -1 ) {
         // コンテンツの上でクリックされたかどうかを調べる
-        // TODO:
-        //   地図上の座標で調べる必要がある
         selectedPolyline = nil;
+        self.editingMode = ModeViewingMap;
         for ( NSInteger index = 0; index < [shapes count]; index++ ) {
             if ( [[shapes objectAtIndex:index] clickCheck:locationInWindow] ) {
                 NSLog( @"mouse %f, %f hits %d th object", locationInWindow.x, locationInWindow.y, index );
@@ -314,9 +317,11 @@
                 [lineColor setColor:selectedPolyline.lineColor];
                 [contentObject showShapePanel];
                 [self setNeedsDisplay:YES];
-                break;
+                return;
             }
         }
+        // コンテンツ上でクリックされたのでなければ、編集パネルを閉じる
+        [contentObject closeShapePanel];
     }
     
     if ( index == -1 ) {
@@ -644,6 +649,8 @@
 // 図形の作成・編集を確定させる
 - (IBAction) finishEditing: (id)sender {
     NSData *aPolyline;
+    NSAffineTransform *screenToMapTransform;
+    
     switch ( self.editingMode ) {
         case ModeCreatePolyline:
             // ポリラインをまだ描いていないので、キャンセル扱い
@@ -655,8 +662,11 @@
 
         case ModeCreatingPolyline:
             // ポリラインを確定させる
-            // TODO:
-            //   地図上の位置に変換する必要がある
+            // 地図上の座標へ変換する
+            screenToMapTransform = [self screenToMapTransform];
+            [creatingPolyline.shapeBezier transformUsingAffineTransform:screenToMapTransform];
+
+            // 保存できるよう NSData に変換し、オブジェクトを追加する
             aPolyline = [NSKeyedArchiver archivedDataWithRootObject:creatingPolyline];
             [contentObject insertPolylineContent:aPolyline];
             
@@ -668,6 +678,11 @@
         
         case ModeEditingPolyline:
             // ポリラインの編集を確定させる
+            // 地図上の座標へ変換する
+            screenToMapTransform = [self screenToMapTransform];
+            [selectedPolyline.shapeBezier transformUsingAffineTransform:screenToMapTransform];
+            
+            // データベースへ反映させる
             aPolyline = [NSKeyedArchiver archivedDataWithRootObject:selectedPolyline];
             [contentObject setPolylineContent:aPolyline atObjectID:selectedPolyline.objectID];
             
@@ -826,6 +841,30 @@
 			break;
 	}
 	return mapHeight;
+}
+
+// 地図からスクリーンへ変換するアフィン変換
+- (NSAffineTransform *) mapToScreenTransform {
+    NSAffineTransform *transform = [NSAffineTransform transform];
+    [transform translateXBy:+[self bounds].size.width / 2.0
+                        yBy:+[self bounds].size.height / 2.0];
+    [transform scaleBy:1 / [self getMeterPerPixel]];
+    [transform translateXBy:-self.center_x
+                        yBy:-self.center_y];
+    
+    return transform;
+}
+
+// スクリーンから地図へ変換するアフィン変換
+- (NSAffineTransform *) screenToMapTransform {
+    NSAffineTransform *transform = [NSAffineTransform transform];
+    [transform translateXBy:+self.center_x
+                        yBy:+self.center_y];
+    [transform scaleBy:[self getMeterPerPixel]];
+    [transform translateXBy:-[self bounds].size.width / 2.0
+                        yBy:-[self bounds].size.height / 2.0];
+
+    return transform;
 }
 
 // Nib ファイルから読み込まれたときに呼ばれる
