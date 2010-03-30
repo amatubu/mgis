@@ -240,7 +240,8 @@
 // 地図をスクロールさせるための事前準備として、ボタンが押された座標を記録しておく
 - (void) mouseDown: (NSEvent *) event
 {
-    NSPoint		locationInWindow = [event locationInWindow];
+    NSPoint locationInWindow = [event locationInWindow];
+    NSUInteger modifierFlags = [event modifierFlags];
     
     if ( [event clickCount] == 2 ) {
         // ダブルクリック
@@ -271,6 +272,20 @@
     NSInteger index = -1;
     if ( selectedPolyline ) {
         index = [selectedPolyline clickedControlPoint:locationInWindow];
+        if ( modifierFlags & NSCommandKeyMask ) {
+            // Command + click でコントロールポイントの削除
+            [selectedPolyline deletePointAtIndex:index];
+            [self setNeedsDisplay:YES];
+            return;
+        }
+        if ( index == -1 ) {
+            // コントロールポイントの間がクリックされたかどうかを調べる
+            index = [selectedPolyline clickedBetweenControlPoint:locationInWindow];
+            if ( index != -1 ) {
+                // ポイントを追加して、続ける（そのままドラッグできる）
+                [selectedPolyline insertPoint:locationInWindow atIndex:index];
+            }
+        }
     }
     
     if ( index == -1 ) {

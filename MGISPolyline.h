@@ -18,9 +18,12 @@
 }
 
 - (void) addPoint:(NSPoint)aPoint;
+- (void) insertPoint:(NSPoint)aPoint atIndex:(NSInteger)index;
+- (void) deletePointAtIndex:(NSInteger)index;
 - (void) draw:(BOOL)selected;
 - (BOOL) clickCheck:(NSPoint)point;
 - (NSInteger) clickedControlPoint:(NSPoint)point;
+- (NSInteger) clickedBetweenControlPoint:(NSPoint)point;
 - (void) moveControlPointTo:(NSPoint)point atIndex:(NSInteger)index;
 - (float) calcDistance:(NSPoint)point lineFrom:(NSPoint)lineStart lineTo:(NSPoint)lineEnd;
 

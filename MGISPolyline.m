@@ -93,13 +93,65 @@ NSString *ContentLineColorKey = @"lineColor";
     
 }
 
-// ポイントを追加する
+// ポイントを最後に追加する
 - (void)addPoint:(NSPoint)aPoint {
     if ( [self.shapeBezier elementCount] == 0 ) {
         [self.shapeBezier moveToPoint:aPoint];
     } else {
         [self.shapeBezier lineToPoint:aPoint];
     }
+}
+
+// ポイントを途中に追加する
+// index が 0 ならば、最初に追加する
+- (void)insertPoint:(NSPoint)aPoint atIndex:(NSInteger)index {
+    if ( index >= [self.shapeBezier elementCount] ) {
+        // ポイントを最後に追加する
+        [self.shapeBezier lineToPoint:aPoint];
+        return;
+    }
+    
+    // 新しいベジエパスを作成する
+    NSBezierPath *newBezier = [NSBezierPath bezierPath];
+    for ( NSInteger i = 0; i < [self.shapeBezier elementCount]; i++ ) {
+        if ( i == index ) {
+            if ( i == 0 ) {
+                [newBezier moveToPoint:aPoint];
+            } else {
+                [newBezier lineToPoint:aPoint];
+            }
+        }
+        NSPoint controlPoint[3];
+        NSBezierPathElement element = [self.shapeBezier elementAtIndex:i
+                                       associatedPoints:&controlPoint[0]];
+        if ( i == 0 && index != 0 ) {
+            [newBezier moveToPoint:controlPoint[0]];
+        } else {
+            [newBezier lineToPoint:controlPoint[0]];
+        }
+    }
+    self.shapeBezier = newBezier;
+}
+
+// ポイントを削除する
+- (void)deletePointAtIndex:(NSInteger)index {
+    // エレメントの数が 2つ以下の場合は削除不可
+    if ( [self.shapeBezier elementCount] <= 2 ) return;
+    
+    NSBezierPath *newBezier = [NSBezierPath bezierPath];
+    for ( NSInteger i = 0; i < [self.shapeBezier elementCount]; i++ ) {
+        if ( i == index ) continue;
+        
+        NSPoint controlPoint[3];
+        NSBezierPathElement element = [self.shapeBezier elementAtIndex:i
+                                       associatedPoints:&controlPoint[0]];
+        if ( i == 0 || index == 0 ) {
+            [newBezier moveToPoint:controlPoint[0]];
+        } else {
+            [newBezier lineToPoint:controlPoint[0]];
+        }
+    }
+    self.shapeBezier = newBezier;
 }
 
 // ポリラインを描画する
@@ -112,17 +164,32 @@ NSString *ContentLineColorKey = @"lineColor";
     [self.shapeBezier stroke];
     if ( selected ) {
         // 選択状態の場合は、各ポイントにマーカーを表示する
-        [[NSColor redColor] set];
+        NSPoint prevPoint;
         for ( NSInteger index = 0; index < [self.shapeBezier elementCount]; index++ ) {
             NSPoint controlPoint[3];
             NSBezierPathElement element = [self.shapeBezier elementAtIndex:index
                                            associatedPoints:&controlPoint[0]];
             if ( element != NSMoveToBezierPathElement && element != NSLineToBezierPathElement ) continue;
 
+            [[NSColor redColor] set];
             [NSBezierPath fillRect:NSMakeRect( controlPoint[0].x - self.lineWidth / 2 - 2,
                                                controlPoint[0].y - self.lineWidth / 2 - 2,
                                                self.lineWidth + 4,
                                                self.lineWidth + 4 )];
+            if ( index > 0 ) {
+                NSPoint betweenPoint = NSMakePoint( ( prevPoint.x + controlPoint[0].x ) / 2,
+                                                    ( prevPoint.y + controlPoint[0].y ) / 2 );
+                NSRect betweenControlRect = NSMakeRect( betweenPoint.x - self.lineWidth / 2 - 2,
+                                                        betweenPoint.y - self.lineWidth / 2 - 2,
+                                                        self.lineWidth + 4,
+                                                        self.lineWidth + 4 );
+                
+                [[[NSColor whiteColor] colorWithAlphaComponent:0.6] set];
+                [NSBezierPath fillRect:betweenControlRect];
+                [[NSColor redColor] set];
+                [NSBezierPath strokeRect:betweenControlRect];
+            }
+            prevPoint = controlPoint[0];
         }
     }
 }
@@ -169,6 +236,35 @@ NSString *ContentLineColorKey = @"lineColor";
                                                    self.lineWidth + 4 ) ) ) {
                 return index;
             }
+        }
+    }
+    return -1;
+}
+
+// ポリラインの点と点の間がクリックされたかどうか
+- (NSInteger)clickedBetweenControlPoint:(NSPoint)point {
+    float halfWidth = [self.shapeBezier lineWidth] / 2.0 + 2.5; // 若干余裕を持たせる
+    if ( NSPointInRect( point, NSInsetRect( [self.shapeBezier bounds], -halfWidth, -halfWidth ) ) ) {
+        NSInteger pointCount = [self.shapeBezier elementCount];
+        NSPoint prevPoint;
+        for ( NSInteger index = 0; index < pointCount; index++ ) {
+            NSPoint controlPoint[3];
+            NSBezierPathElement element = [self.shapeBezier elementAtIndex:index
+                                           associatedPoints:&controlPoint[0]];
+            if ( element != NSMoveToBezierPathElement && element != NSLineToBezierPathElement ) continue;
+            
+            if ( index > 0 ) {
+                NSPoint betweenPoint = NSMakePoint( ( prevPoint.x + controlPoint[0].x ) / 2,
+                                                   ( prevPoint.y + controlPoint[0].y ) / 2 );
+                NSRect betweenControlRect = NSMakeRect( betweenPoint.x - self.lineWidth / 2 - 2,
+                                                       betweenPoint.y - self.lineWidth / 2 - 2,
+                                                       self.lineWidth + 4,
+                                                       self.lineWidth + 4 );
+                if ( NSPointInRect( point, betweenControlRect ) ) {
+                    return index;
+                }
+            }
+            prevPoint = controlPoint[0];
         }
     }
     return -1;
