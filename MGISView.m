@@ -435,56 +435,35 @@
 		
 		// オフセットが画面の一番右に逹っするまで繰り返す
 		while ( imageOffsetY < size.height ) {
-			// LARGE サイズのメッシュッコードを得る
-			// MIDDLE、DETAIL サイズについても、このコードを使う
-			NSString *meshString = [self getLargeMesh:NSMakePoint( x, y )];
-			
-			NSString *mapFile;
-			switch (self.zoom) {
-				case ZoomLarge:
-				case ZoomLarge2:
-					// LARGE サイズの場合は、LARGE フォルダに「メッシュコード名.*」という形式で保存されている
-					mapFile = [self.map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"LARGE/%@%@%@",
-																		  @"06", meshString, map_suffix]];
-					break;
-				case ZoomMiddle:
-				case ZoomMiddle2:
-					// MIDDLE サイズの場合は、MIDDLE フォルダの中に、そのメッシュを含む LARGE サイズの
-					// メッシュコード名のフォルダがあり、その中に保存されている
-				{
-					NSString *middleMeshString = [self getMiddleMesh:NSMakePoint( x, y )];
-					NSLog(@"Middle mesh: %@", middleMeshString);
-					NSLog(@"Path %@", [NSString stringWithFormat:@"MIDDLE/%@%@/%@%@%@%@", @"06", meshString, @"06", meshString, middleMeshString, map_suffix]);
-					mapFile = [self.map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"MIDDLE/%@%@/%@%@%@%@",
-																		  @"06",meshString,@"06",meshString,middleMeshString,map_suffix]];
-				}
-					break;
-				case ZoomDetail:
-					// DETAIL サイズの場合は、DETAIL フォルダの中に、そのメッシュを含む LARGE サイズの
-					// メッシュコード名のフォルダがあり、その中に保存されている
-				{
-					NSString *detailMeshString = [self getDetailMesh:NSMakePoint( x, y )];
-					mapFile = [self.map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"DETAIL/%@%@/%@%@%@%@",
-																		  @"06",meshString,@"06",meshString,detailMeshString,map_suffix]];
-				}
-					break;
-				default:
-					continue;
-			}
-			
-			NSLog(@"Map file: %@", mapFile);
-			NSLog(@"Offset: %.3f, %.3f", imageOffsetX, imageOffsetY);
-			
-			// 画像ファイルを得る
-			NSImage *anImage = [[NSImage alloc] initWithContentsOfFile:mapFile];
-			if ( anImage ) {
-				// NSImage が得られたら、計算しておいたオフセットの位置へ描画する
-				//					[anImage compositeToPoint:NSMakePoint( imageOffsetX, imageOffsetY ) operation:NSCompositeSourceOver];
-				[anImage drawInRect:NSMakeRect( imageOffsetX, imageOffsetY, mapImageWidth, mapImageHeight )
-						   fromRect:NSZeroRect
-						  operation:NSCompositeSourceOver fraction:1.0];
-				[anImage release];
-			}
+            if ( [self.map_suffix isEqualToString:@".hybrid"] ) {
+                NSImage *photoImage = [self getMeshImageAtPoint:NSMakePoint( x, y ) withSuffix:@".jpg"];
+                if ( photoImage ) {
+                    [photoImage drawInRect:NSMakeRect( imageOffsetX, imageOffsetY, mapImageWidth, mapImageHeight )
+                                  fromRect:NSZeroRect
+                                 operation:NSCompositeSourceOver fraction:1.0];
+                    [photoImage release];
+                }
+                NSImage *mapImage = [self getMeshImageAtPoint:NSMakePoint( x, y ) withSuffix:@".png"];
+                if ( mapImage ) {
+                    [mapImage drawInRect:NSMakeRect( imageOffsetX, imageOffsetY, mapImageWidth, mapImageHeight )
+                                fromRect:NSZeroRect
+                               operation:NSCompositeSourceOver fraction:0.2];
+                    [mapImage drawInRect:NSMakeRect( imageOffsetX, imageOffsetY, mapImageWidth, mapImageHeight )
+                                fromRect:NSZeroRect
+                               operation:NSCompositePlusDarker fraction:0.8];
+                    [mapImage release];
+                }
+            } else {
+                NSImage *anImage = [self getMeshImageAtPoint:NSMakePoint( x, y ) withSuffix:self.map_suffix];
+                if ( anImage ) {
+                    // NSImage が得られたら、計算しておいたオフセットの位置へ描画する
+                    //					[anImage compositeToPoint:NSMakePoint( imageOffsetX, imageOffsetY ) operation:NSCompositeSourceOver];
+                    [anImage drawInRect:NSMakeRect( imageOffsetX, imageOffsetY, mapImageWidth, mapImageHeight )
+                               fromRect:NSZeroRect
+                              operation:NSCompositeSourceOver fraction:1.0];
+                    [anImage release];
+                }
+            }
 			
 			// Y 方向の次のメッシュへ
 			y += mapImageHeight * meterPerPixel;
@@ -495,7 +474,55 @@
 		imageOffsetX += mapImageWidth;
 	}
 	[self.offscreenImage unlockFocus];
-}	
+}
+
+// 特定の位置を含むメッシュイメージを得る
+- (NSImage *) getMeshImageAtPoint:(NSPoint)point withSuffix:(NSString *)suffix {
+    // LARGE サイズのメッシュッコードを得る
+    // MIDDLE、DETAIL サイズについても、このコードを使う
+    NSString *meshString = [self getLargeMesh:point];
+    
+    NSString *mapFile;
+    switch (self.zoom) {
+        case ZoomLarge:
+        case ZoomLarge2:
+            // LARGE サイズの場合は、LARGE フォルダに「メッシュコード名.*」という形式で保存されている
+            mapFile = [self.map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"LARGE/%@%@%@",
+                                                                       @"06", meshString, suffix]];
+            break;
+        case ZoomMiddle:
+        case ZoomMiddle2:
+            // MIDDLE サイズの場合は、MIDDLE フォルダの中に、そのメッシュを含む LARGE サイズの
+            // メッシュコード名のフォルダがあり、その中に保存されている
+        {
+            NSString *middleMeshString = [self getMiddleMesh:point];
+            NSLog(@"Middle mesh: %@", middleMeshString);
+            NSLog(@"Path %@", [NSString stringWithFormat:@"MIDDLE/%@%@/%@%@%@%@", @"06", meshString, @"06", meshString, middleMeshString, map_suffix]);
+            mapFile = [self.map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"MIDDLE/%@%@/%@%@%@%@",
+                                                                       @"06",meshString,@"06",meshString,middleMeshString,suffix]];
+        }
+            break;
+        case ZoomDetail:
+            // DETAIL サイズの場合は、DETAIL フォルダの中に、そのメッシュを含む LARGE サイズの
+            // メッシュコード名のフォルダがあり、その中に保存されている
+        {
+            NSString *detailMeshString = [self getDetailMesh:point];
+            mapFile = [self.map_folder stringByAppendingPathComponent:[NSString stringWithFormat:@"DETAIL/%@%@/%@%@%@%@",
+                                                                       @"06",meshString,@"06",meshString,detailMeshString,suffix]];
+        }
+            break;
+        default:
+            return nil;
+    }
+    
+    NSLog(@"Map file: %@", mapFile);
+    
+    // 画像ファイルを得る
+    NSImage *anImage = [[NSImage alloc] initWithContentsOfFile:mapFile];
+    
+    return anImage;
+}    
+
 
 // 情報ウィンドウの内容を更新する
 // 現在は中心点の直交座標系での座標のみを表示
@@ -562,6 +589,9 @@
 		case 1:
 			self.map_suffix = @".jpg";
 			break;
+        case 2:
+            self.map_suffix = @".hybrid";
+            break;
 		default:
 			self.map_suffix = @".jpg";
 			break;

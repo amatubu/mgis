@@ -2,21 +2,21 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10C540</string>
+		<string key="IBDocument.SystemVersion">10D573</string>
 		<string key="IBDocument.InterfaceBuilderVersion">740</string>
-		<string key="IBDocument.AppKitVersion">1038.25</string>
-		<string key="IBDocument.HIToolboxVersion">458.00</string>
+		<string key="IBDocument.AppKitVersion">1038.29</string>
+		<string key="IBDocument.HIToolboxVersion">460.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">740</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="455"/>
 			<integer value="1090"/>
 			<integer value="548"/>
-			<integer value="450"/>
+			<integer value="371"/>
 			<integer value="1268"/>
+			<integer value="455"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1290,7 +1290,7 @@
 								<object class="NSSegmentedControl" id="830728299">
 									<reference key="NSNextResponder" ref="393972330"/>
 									<int key="NSvFlags">268</int>
-									<string key="NSFrame">{{19, 565}, {75, 15}}</string>
+									<string key="NSFrame">{{19, 565}, {117, 15}}</string>
 									<reference key="NSSuperview" ref="393972330"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSSegmentedCell" key="NSCell" id="194305601">
@@ -1312,6 +1312,10 @@
 												<string key="NSSegmentItemLabel">Photo</string>
 												<int key="NSSegmentItemTag">1</int>
 												<bool key="NSSegmentItemSelected">YES</bool>
+												<int key="NSSegmentItemImageScaling">0</int>
+											</object>
+											<object class="NSSegmentItem">
+												<string key="NSSegmentItemLabel">Hybrid</string>
 												<int key="NSSegmentItemImageScaling">0</int>
 											</object>
 										</object>
@@ -5848,12 +5852,12 @@
 						<reference key="object" ref="393972330"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="830728299"/>
 							<reference ref="665235847"/>
 							<reference ref="37017502"/>
 							<reference ref="486950703"/>
 							<reference ref="427648717"/>
 							<reference ref="748315920"/>
+							<reference ref="830728299"/>
 						</object>
 						<reference key="parent" ref="439893737"/>
 					</object>

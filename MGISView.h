@@ -109,6 +109,7 @@ typedef enum {
 - (void) updateScaleText;
 - (void) drawCenterMarker: (NSRect)viewRect;
 - (void) updateOffscreenImageAtOrigin:(NSPoint)origin size:(NSSize)size;
+- (NSImage *) getMeshImageAtPoint:(NSPoint)point withSuffix:(NSString *)suffix;
 
 - (IBAction) changeZoomLevel:(id)sender;
 - (IBAction) changeMapFormat:(id)sender;
