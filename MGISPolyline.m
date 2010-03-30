@@ -108,8 +108,6 @@ NSString *ContentLineColorKey = @"lineColor";
     [self.lineColor set];
 
     // ポリラインのベジエパスを得る
-    // TODO:
-    //   地図上の位置から変換する必要がある
     [self.shapeBezier setLineWidth:self.lineWidth];
     [self.shapeBezier stroke];
     if ( selected ) {
@@ -179,7 +177,7 @@ NSString *ContentLineColorKey = @"lineColor";
 - (float)calcDistance:(NSPoint)point lineFrom:(NSPoint)lineStart lineTo:(NSPoint)lineEnd {
     NSRect lineRect = NSMakeRect( fmin( lineStart.x, lineEnd.x ), fmin( lineStart.y, lineEnd.y ),
                                   fabs( lineStart.x - lineEnd.x ), fabs( lineStart.y - lineEnd.y ) );
-    if ( !NSPointInRect( point, lineRect ) ) {
+    if ( !NSPointInRect( point, NSInsetRect( lineRect, -10.0, -10.0 ) ) ) {
         return 1.0e10;
     }
     float v1 = fabs( ( lineStart.y - lineEnd.y ) * point.x - ( lineStart.x - lineEnd.x ) * point.y + lineStart.x * lineEnd.y - lineEnd.x * lineStart.y );
