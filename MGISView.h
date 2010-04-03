@@ -88,9 +88,9 @@ typedef enum {
 
 	CoordinateConverter *converter;
 	
-    MGISContent *creatingPolyline;
+    MGISContent *creatingContent;
     NSMutableArray *shapes;
-    MGISContent *selectedPolyline;
+    MGISContent *selectedContent;
 }
 
 - (void) setupDefaults;

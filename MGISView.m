@@ -209,19 +209,19 @@
         NSData *shape = [aObject valueForKey:@"shape"];
         if ( shape ) {
 //            NSLog( @"  has shape" );
-            MGISContent *polyline = [NSKeyedUnarchiver unarchiveObjectWithData:shape];
-            if ( polyline ) {
-//                NSLog( @"  has polyline %@", polyline );
-                polyline.objectID = [aObject objectID];
+            MGISContent *aContent = [NSKeyedUnarchiver unarchiveObjectWithData:shape];
+            if ( aContent ) {
+                NSLog( @"  has %@", [aContent class] );
+                aContent.objectID = [aObject objectID];
                 // ベジエパスを画面上の座標に変換する
-                [polyline applyAffineTransform:mapToScreenTransform];
-                if ( selectedPolyline && ( polyline.objectID == selectedPolyline.objectID ) ) {
+                [aContent applyAffineTransform:mapToScreenTransform];
+                if ( selectedContent && ( aContent.objectID == selectedContent.objectID ) ) {
 //                    NSLog( @"  is selected" );
-                    [selectedPolyline draw:YES];
-                    [shapes addObject:[selectedPolyline retain]];
+                    [selectedContent draw:YES];
+                    [shapes addObject:[selectedContent retain]];
                 } else {
-                    [polyline draw:NO];
-                    [shapes addObject:[polyline retain]];
+                    [aContent draw:NO];
+                    [shapes addObject:[aContent retain]];
                 }
             }
         }
@@ -232,7 +232,7 @@
 
     // ポリラインコンテンツ
     if ( self.editingMode == ModeCreatingPolyline ) {
-        [creatingPolyline draw:NO];
+        [creatingContent draw:NO];
     }
 }
 
@@ -270,27 +270,27 @@
     
     // コントロールポイント上でクリックされたかどうかを調べる
     NSInteger index = -1;
-    if ( selectedPolyline ) {
-        index = [selectedPolyline clickedControlPoint:locationInWindow];
+    if ( selectedContent ) {
+        index = [selectedContent clickedControlPoint:locationInWindow];
         if ( modifierFlags & NSCommandKeyMask ) {
             // Command + click でコントロールポイントの削除
-            [selectedPolyline deletePointAtIndex:index];
+            [selectedContent deletePointAtIndex:index];
             [self setNeedsDisplay:YES];
             return;
         }
         if ( index == -1 ) {
             // コントロールポイントの間がクリックされたかどうかを調べる
-            index = [selectedPolyline clickedBetweenControlPoint:locationInWindow];
+            index = [selectedContent clickedBetweenControlPoint:locationInWindow];
             if ( index != -1 ) {
                 // ポイントを追加して、続ける（そのままドラッグできる）
-                [selectedPolyline insertPoint:locationInWindow atIndex:index];
+                [selectedContent insertPoint:locationInWindow atIndex:index];
             }
         }
     }
     
     if ( index == -1 ) {
         // コンテンツの上でクリックされたかどうかを調べる
-        selectedPolyline = nil;
+        selectedContent = nil;
         self.editingMode = ModeViewingMap;
         for ( NSInteger index = 0; index < [shapes count]; index++ ) {
             if ( [[shapes objectAtIndex:index] clickCheck:locationInWindow] ) {
@@ -298,10 +298,10 @@
                 // 選択
                 // TODO:
                 //   mouseUp で、ドラッグでない場合に処理するべき
-                selectedPolyline = [shapes objectAtIndex:index];
+                selectedContent = [shapes objectAtIndex:index];
                 self.editingMode = ModeEditingPolyline;
-                [lineWidth setIntValue:[selectedPolyline getLineWidth]];
-                [lineColor setColor:[selectedPolyline getLineColor]];
+                [lineWidth setIntValue:[selectedContent getLineWidth]];
+                [lineColor setColor:[selectedContent getLineColor]];
                 [contentObject showShapePanel];
                 [self setNeedsDisplay:YES];
                 return;
@@ -339,7 +339,7 @@
         
         // コントロールポイントを更新
         NSPoint targetedPoint = [evt locationInWindow];
-        [selectedPolyline moveControlPointTo:targetedPoint atIndex:index];
+        [selectedContent moveControlPointTo:targetedPoint atIndex:index];
         
         // 再描画
         [self setNeedsDisplay:YES];
@@ -387,9 +387,9 @@
     }
 
     if ( self.editingMode == ModeCreatePolyline ) {
-        creatingPolyline = [[MGISPolyline alloc] init];
-        if ( creatingPolyline ) {
-            [creatingPolyline addPoint:mousePoint];
+        creatingContent = [[MGISPolyline alloc] init];
+        if ( creatingContent ) {
+            [creatingContent addPoint:mousePoint];
         }
         self.editingMode = ModeCreatingPolyline;
         [self setNeedsDisplay:YES];
@@ -397,7 +397,7 @@
     }
     if ( self.editingMode == ModeCreatingPolyline ) {
         
-        [creatingPolyline addPoint:mousePoint];
+        [creatingContent addPoint:mousePoint];
         [self setNeedsDisplay:YES];
         return;
     }
@@ -605,10 +605,10 @@
     switch ( self.editingMode ) {
         case ModeCreatePolyline:
         case ModeCreatingPolyline:
-            [creatingPolyline setLineWidth:width];
+            [creatingContent setLineWidth:width];
             break;
         case ModeEditingPolyline:
-            [selectedPolyline setLineWidth:width];
+            [selectedContent setLineWidth:width];
             break;
         default:
             break;
@@ -622,10 +622,10 @@
     switch ( self.editingMode ) {
         case ModeCreatePolyline:
         case ModeCreatingPolyline:
-            [creatingPolyline setLineColor:color];
+            [creatingContent setLineColor:color];
             break;
         case ModeEditingPolyline:
-            [selectedPolyline setLineColor:color];
+            [selectedContent setLineColor:color];
         default:
             break;
     }
@@ -638,8 +638,8 @@
         case ModeCreatePolyline:
         case ModeCreatingPolyline:
             // ポリラインの作成をキャンセルする
-            [creatingPolyline release];
-            creatingPolyline = nil;
+            [creatingContent release];
+            creatingContent = nil;
             self.editingMode = ModeViewingMap;
             
             // 設定パネルを閉じる
@@ -648,7 +648,7 @@
         
         case ModeEditingPolyline:
             // ポリラインの編集をキャンセルする
-            selectedPolyline = nil;
+            selectedContent = nil;
             
             // 設定パネルを閉じる
             [contentObject closeShapePanel];
@@ -663,14 +663,14 @@
 
 // 図形の作成・編集を確定させる
 - (IBAction) finishEditing: (id)sender {
-    NSData *aPolyline;
+    NSData *aContent;
     NSAffineTransform *screenToMapTransform;
     
     switch ( self.editingMode ) {
         case ModeCreatePolyline:
             // ポリラインをまだ描いていないので、キャンセル扱い
-            [creatingPolyline release];
-            creatingPolyline = nil;
+            [creatingContent release];
+            creatingContent = nil;
             self.editingMode = ModeViewingMap;
             [contentObject closeShapePanel];
             break;
@@ -679,15 +679,15 @@
             // ポリラインを確定させる
             // 地図上の座標へ変換する
             screenToMapTransform = [self screenToMapTransform];
-            [creatingPolyline applyAffineTransform:screenToMapTransform];
+            [creatingContent applyAffineTransform:screenToMapTransform];
 
             // 保存できるよう NSData に変換し、オブジェクトを追加する
-            aPolyline = [NSKeyedArchiver archivedDataWithRootObject:creatingPolyline];
-            [contentObject insertPolylineContent:aPolyline];
+            aContent = [NSKeyedArchiver archivedDataWithRootObject:creatingContent];
+            [contentObject insertPolylineContent:aContent];
             
             // 作成中ポリラインを破棄し、地図モードに戻る
-            [creatingPolyline release];
-            creatingPolyline = nil;
+            [creatingContent release];
+            creatingContent = nil;
             self.editingMode = ModeViewingMap;
             break;
         
@@ -695,14 +695,14 @@
             // ポリラインの編集を確定させる
             // 地図上の座標へ変換する
             screenToMapTransform = [self screenToMapTransform];
-            [selectedPolyline applyAffineTransform:screenToMapTransform];
+            [selectedContent applyAffineTransform:screenToMapTransform];
             
             // データベースへ反映させる
-            aPolyline = [NSKeyedArchiver archivedDataWithRootObject:selectedPolyline];
-            [contentObject setPolylineContent:aPolyline atObjectID:selectedPolyline.objectID];
+            aContent = [NSKeyedArchiver archivedDataWithRootObject:selectedContent];
+            [contentObject setPolylineContent:aContent atObjectID:selectedContent.objectID];
             
             // ポリラインの選択を解除し、地図モードに戻る
-            selectedPolyline = nil;
+            selectedContent = nil;
             self.editingMode = ModeViewingMap;
             break;
         
