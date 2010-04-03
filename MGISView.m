@@ -300,8 +300,8 @@
                 //   mouseUp で、ドラッグでない場合に処理するべき
                 selectedPolyline = [shapes objectAtIndex:index];
                 self.editingMode = ModeEditingPolyline;
-                [lineWidth setIntValue:selectedPolyline.lineWidth];
-                [lineColor setColor:selectedPolyline.lineColor];
+                [lineWidth setIntValue:[selectedPolyline getLineWidth]];
+                [lineColor setColor:[selectedPolyline getLineColor]];
                 [contentObject showShapePanel];
                 [self setNeedsDisplay:YES];
                 return;
@@ -605,12 +605,10 @@
     switch ( self.editingMode ) {
         case ModeCreatePolyline:
         case ModeCreatingPolyline:
-            creatingPolyline.lineWidth = width;
-            [creatingPolyline.shapeBezier setLineWidth:width];
+            [creatingPolyline setLineWidth:width];
             break;
         case ModeEditingPolyline:
-            selectedPolyline.lineWidth = width;
-            [selectedPolyline.shapeBezier setLineWidth:width];
+            [selectedPolyline setLineWidth:width];
             break;
         default:
             break;
@@ -624,10 +622,10 @@
     switch ( self.editingMode ) {
         case ModeCreatePolyline:
         case ModeCreatingPolyline:
-            creatingPolyline.lineColor = color;
+            [creatingPolyline setLineColor:color];
             break;
         case ModeEditingPolyline:
-            selectedPolyline.lineColor = color;
+            [selectedPolyline setLineColor:color];
         default:
             break;
     }
@@ -681,7 +679,7 @@
             // ポリラインを確定させる
             // 地図上の座標へ変換する
             screenToMapTransform = [self screenToMapTransform];
-            [creatingPolyline.shapeBezier transformUsingAffineTransform:screenToMapTransform];
+            [creatingPolyline applyAffineTransform:screenToMapTransform];
 
             // 保存できるよう NSData に変換し、オブジェクトを追加する
             aPolyline = [NSKeyedArchiver archivedDataWithRootObject:creatingPolyline];
@@ -697,7 +695,7 @@
             // ポリラインの編集を確定させる
             // 地図上の座標へ変換する
             screenToMapTransform = [self screenToMapTransform];
-            [selectedPolyline.shapeBezier transformUsingAffineTransform:screenToMapTransform];
+            [selectedPolyline applyAffineTransform:screenToMapTransform];
             
             // データベースへ反映させる
             aPolyline = [NSKeyedArchiver archivedDataWithRootObject:selectedPolyline];

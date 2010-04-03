@@ -56,6 +56,24 @@
 - (void)deletePointAtIndex:(NSInteger)index {
 }
 
+// 線の太さを設定する
+- (void)setLineWidth:(CGFloat)width {
+}
+
+// 線の太さを得る
+- (CGFloat)getLineWidth {
+    return 0;
+}
+
+// 線の色を設定する
+- (void)setLineColor:(NSColor *)color {
+}
+
+// 線の色を得る
+- (NSColor *)getLineColor {
+    return [NSColor blackColor];
+}
+
 // 描画する
 - (void)draw:(BOOL)selected {
 }

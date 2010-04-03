@@ -17,6 +17,10 @@
 - (void) addPoint:(NSPoint)aPoint;
 - (void) insertPoint:(NSPoint)aPoint atIndex:(NSInteger)index;
 - (void) deletePointAtIndex:(NSInteger)index;
+- (void) setLineWidth:(CGFloat)width;
+- (CGFloat) getLineWidth;
+- (void) setLineColor:(NSColor *)color;
+- (NSColor *) getLineColor;
 - (void) draw:(BOOL)selected;
 - (BOOL) clickCheck:(NSPoint)point;
 - (NSInteger) clickedControlPoint:(NSPoint)point;
