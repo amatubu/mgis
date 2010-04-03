@@ -209,12 +209,12 @@
         NSData *shape = [aObject valueForKey:@"shape"];
         if ( shape ) {
 //            NSLog( @"  has shape" );
-            MGISPolyline *polyline = [NSKeyedUnarchiver unarchiveObjectWithData:shape];
+            MGISContent *polyline = [NSKeyedUnarchiver unarchiveObjectWithData:shape];
             if ( polyline ) {
 //                NSLog( @"  has polyline %@", polyline );
                 polyline.objectID = [aObject objectID];
                 // ベジエパスを画面上の座標に変換する
-                [polyline.shapeBezier transformUsingAffineTransform:mapToScreenTransform];
+                [polyline applyAffineTransform:mapToScreenTransform];
                 if ( selectedPolyline && ( polyline.objectID == selectedPolyline.objectID ) ) {
 //                    NSLog( @"  is selected" );
                     [selectedPolyline draw:YES];

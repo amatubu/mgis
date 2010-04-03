@@ -8,6 +8,7 @@
 
 #import <AppKit/NSView.h>
 #import "CoordinateConverter.h"
+#import "MGISContent.h"
 #import "MGISPolyline.h"
 
 typedef enum {

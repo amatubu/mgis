@@ -11,11 +11,9 @@
 
 @implementation MGISPolyline
 
-@synthesize bounds;
 @synthesize lineWidth;
 @synthesize shapeBezier;
 @synthesize lineColor;
-@synthesize objectID;
 
 NSString *ContentPointsKey = @"points";
 NSString *ContentLineWidthKey = @"lineWidth";
@@ -274,6 +272,13 @@ NSString *ContentLineColorKey = @"lineColor";
 - (void)moveControlPointTo:(NSPoint)point atIndex:(NSInteger)index {
     [self.shapeBezier setAssociatedPoints:&point atIndex:index];
 }
+
+// アフィン変換を適用する
+- (void)applyAffineTransform:(NSAffineTransform *)transform {
+    [self.shapeBezier transformUsingAffineTransform:transform];
+}
+
+// プライベート関数
 
 // 線分と点の間の距離を計算
 - (float)calcDistance:(NSPoint)point lineFrom:(NSPoint)lineStart lineTo:(NSPoint)lineEnd {
