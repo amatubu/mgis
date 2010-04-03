@@ -179,8 +179,8 @@
 	NSLog( @"createTextContent %@", sender );
 }
 
-// ポリラインを追加する
-- (void) insertPolylineContent:(NSData *)aPolyline {
+// コンテンツを追加する
+- (void) insertContent:(NSData *)aContent ofClass:(Class)class {
     NSManagedObjectContext *context = [self managedObjectContext];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Contents"
                                               inManagedObjectContext:context];
@@ -189,7 +189,7 @@
     NSManagedObject *object = [[NSManagedObject alloc] initWithEntity:entity
                                        insertIntoManagedObjectContext:context];
     // 図形を設定する
-    [object setValue:aPolyline forKey:@"shape"];
+    [object setValue:aContent forKey:@"shape"];
     
     // レイヤーの設定をする
     // TODO:
@@ -220,12 +220,12 @@
 }
 
 // ポリラインを設定する
-- (void) setPolylineContent:(NSData *)aPolyline atObjectID:(NSManagedObjectID *)objectID {
+- (void) setContent:(NSData *)aContent ofClass:(Class)class atObjectID:(NSManagedObjectID *)objectID {
     NSManagedObjectContext *context = [self managedObjectContext];
 
     // ポリラインを設定する
     NSManagedObject *object = [context objectWithID:objectID];
-    [object setValue:aPolyline forKey:@"shape"];
+    [object setValue:aContent forKey:@"shape"];
     
     // 設定パネルを閉じる
     [self closeShapePanel];

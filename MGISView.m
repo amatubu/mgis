@@ -683,7 +683,7 @@
 
             // 保存できるよう NSData に変換し、オブジェクトを追加する
             aContent = [NSKeyedArchiver archivedDataWithRootObject:creatingContent];
-            [contentObject insertPolylineContent:aContent];
+            [contentObject insertContent:aContent ofClass:[creatingContent class]];
             
             // 作成中ポリラインを破棄し、地図モードに戻る
             [creatingContent release];
@@ -699,7 +699,7 @@
             
             // データベースへ反映させる
             aContent = [NSKeyedArchiver archivedDataWithRootObject:selectedContent];
-            [contentObject setPolylineContent:aContent atObjectID:selectedContent.objectID];
+            [contentObject setContent:aContent ofClass:[selectedContent class] atObjectID:selectedContent.objectID];
             
             // ポリラインの選択を解除し、地図モードに戻る
             selectedContent = nil;

@@ -48,8 +48,8 @@
 - (IBAction) createPolygonContent:(id)sender;
 - (IBAction) createTextContent:(id)sernder;
 
-- (void) insertPolylineContent:(NSData *)aPolyline;
-- (void) setPolylineContent:(NSData *)aPolyline atObjectID:(NSManagedObjectID *)objectID;
+- (void) insertContent:(NSData *)aContent ofClass:(Class)aClass;
+- (void) setContent:(NSData *)aContent ofClass:(Class)aClass atObjectID:(NSManagedObjectID *)objectID;
 - (void) showShapePanel;
 - (void) closeShapePanel;
 
