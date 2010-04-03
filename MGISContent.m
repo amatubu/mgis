@@ -61,7 +61,7 @@
 }
 
 // 線の太さを得る
-- (CGFloat)getLineWidth {
+- (CGFloat)lineWidth {
     return 0;
 }
 
@@ -70,7 +70,7 @@
 }
 
 // 線の色を得る
-- (NSColor *)getLineColor {
+- (NSColor *)lineColor {
     return [NSColor blackColor];
 }
 

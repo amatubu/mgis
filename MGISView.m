@@ -300,8 +300,8 @@
                 //   mouseUp で、ドラッグでない場合に処理するべき
                 selectedContent = [shapes objectAtIndex:index];
                 self.editingMode = ModeEditingPolyline;
-                [lineWidth setIntValue:[selectedContent getLineWidth]];
-                [lineColor setColor:[selectedContent getLineColor]];
+                [lineWidth setIntValue:[selectedContent lineWidth]];
+                [lineColor setColor:[selectedContent lineColor]];
                 [contentObject showShapePanel];
                 [self setNeedsDisplay:YES];
                 return;
