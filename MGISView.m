@@ -571,9 +571,22 @@
 
 // 地図のズームレベルを変更した際に呼ばれる
 - (IBAction) changeZoomLevel: (id)sender {
-	int prevZoom = self.zoom;
-	self.zoom = ZoomLarge2 - [self.zoomSlider intValue];
-	if ( self.zoom != prevZoom ) {
+    int newZoom = ZoomLarge2 - [self.zoomSlider intValue];
+	if ( self.zoom != newZoom ) {
+        if ( creatingContent ) {
+            [creatingContent applyAffineTransform:[self screenToMapTransform]];
+        }
+        if ( selectedContent ) {
+            [selectedContent applyAffineTransform:[self screenToMapTransform]];
+        }
+        self.zoom = newZoom;
+        if ( creatingContent ) {
+            [creatingContent applyAffineTransform:[self mapToScreenTransform]];
+        }
+        if ( selectedContent ) {
+            [selectedContent applyAffineTransform:[self mapToScreenTransform]];
+        }
+
 		[self setNeedsDisplay:YES];
 		[self updateScaleText];
 	}
