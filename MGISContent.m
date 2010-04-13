@@ -101,4 +101,9 @@
 - (void)applyAffineTransform:(NSAffineTransform *)transform {
 }
 
+// 図形の代表点を得る
+- (NSPoint)representativePoint {
+    return NSZeroPoint;
+}
+
 @end

@@ -12,11 +12,11 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="1268"/>
+			<integer value="371"/>
+			<integer value="455"/>
 			<integer value="1090"/>
 			<integer value="548"/>
-			<integer value="371"/>
-			<integer value="1268"/>
-			<integer value="455"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2363,6 +2363,26 @@
 								<string key="NSContents">Import</string>
 								<reference key="NSSupport" ref="85528458"/>
 								<reference key="NSControlView" ref="444932232"/>
+								<int key="NSButtonFlags">-2033434369</int>
+								<int key="NSButtonFlags2">162</int>
+								<string key="NSAlternateContents"/>
+								<string key="NSKeyEquivalent"/>
+								<int key="NSPeriodicDelay">400</int>
+								<int key="NSPeriodicInterval">75</int>
+							</object>
+						</object>
+						<object class="NSButton" id="800617037">
+							<reference key="NSNextResponder" ref="524075787"/>
+							<int key="NSvFlags">297</int>
+							<string key="NSFrame">{{716, 236}, {59, 28}}</string>
+							<reference key="NSSuperview" ref="524075787"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSButtonCell" key="NSCell" id="925329859">
+								<int key="NSCellFlags">-2080244224</int>
+								<int key="NSCellFlags2">134217728</int>
+								<string key="NSContents">Go</string>
+								<reference key="NSSupport" ref="85528458"/>
+								<reference key="NSControlView" ref="800617037"/>
 								<int key="NSButtonFlags">-2033434369</int>
 								<int key="NSButtonFlags2">162</int>
 								<string key="NSAlternateContents"/>
@@ -5020,6 +5040,30 @@
 					</object>
 					<int key="connectionID">1315</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">enabled: selection.@count</string>
+						<reference key="source" ref="800617037"/>
+						<reference key="destination" ref="787590864"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="800617037"/>
+							<reference key="NSDestination" ref="787590864"/>
+							<string key="NSLabel">enabled: selection.@count</string>
+							<string key="NSBinding">enabled</string>
+							<string key="NSKeyPath">selection.@count</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">1319</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">scrollToContent:</string>
+						<reference key="source" ref="237659277"/>
+						<reference key="destination" ref="800617037"/>
+					</object>
+					<int key="connectionID">1320</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -6089,6 +6133,7 @@
 							<reference ref="495181510"/>
 							<reference ref="999816330"/>
 							<reference ref="444932232"/>
+							<reference ref="800617037"/>
 						</object>
 						<reference key="parent" ref="409414691"/>
 					</object>
@@ -7180,6 +7225,20 @@
 						<reference key="object" ref="354000318"/>
 						<reference key="parent" ref="829439909"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1316</int>
+						<reference key="object" ref="800617037"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="925329859"/>
+						</object>
+						<reference key="parent" ref="524075787"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1317</int>
+						<reference key="object" ref="925329859"/>
+						<reference key="parent" ref="800617037"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -7333,6 +7392,8 @@
 					<string>1300.IBPluginDependency</string>
 					<string>131.IBPluginDependency</string>
 					<string>131.ImportedFromIB2</string>
+					<string>1316.IBPluginDependency</string>
+					<string>1317.IBPluginDependency</string>
 					<string>134.IBPluginDependency</string>
 					<string>134.ImportedFromIB2</string>
 					<string>136.IBPluginDependency</string>
@@ -7735,6 +7796,8 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
@@ -7932,9 +7995,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{58, 229}, {861, 441}}</string>
+					<string>{{101, 333}, {861, 441}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{58, 229}, {861, 441}}</string>
+					<string>{{101, 333}, {861, 441}}</string>
 					<boolean value="NO"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -8003,7 +8066,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1315</int>
+			<int key="maxID">1320</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -8022,11 +8085,13 @@
 							<string>exportContents:</string>
 							<string>importContents:</string>
 							<string>saveAction:</string>
+							<string>scrollToContent:</string>
 							<string>showDetailWindow:</string>
 							<string>showListWindow:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>

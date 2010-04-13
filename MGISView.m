@@ -696,7 +696,8 @@
 
             // 保存できるよう NSData に変換し、オブジェクトを追加する
             aContent = [NSKeyedArchiver archivedDataWithRootObject:creatingContent];
-            [contentObject insertContent:aContent ofClass:[creatingContent class]];
+            NSPoint repPoint = [creatingContent representativePoint];
+            [contentObject insertContent:aContent ofClass:[creatingContent class] atPoint:repPoint];
             
             // 作成中ポリラインを破棄し、地図モードに戻る
             [creatingContent release];
@@ -712,7 +713,8 @@
             
             // データベースへ反映させる
             aContent = [NSKeyedArchiver archivedDataWithRootObject:selectedContent];
-            [contentObject setContent:aContent ofClass:[selectedContent class] atObjectID:selectedContent.objectID];
+            repPoint = [selectedContent representativePoint];
+            [contentObject setContent:aContent ofClass:[selectedContent class] atObjectID:selectedContent.objectID atPoint:repPoint];
             
             // ポリラインの選択を解除し、地図モードに戻る
             selectedContent = nil;

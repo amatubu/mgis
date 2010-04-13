@@ -27,6 +27,7 @@
 - (NSInteger) clickedBetweenControlPoint:(NSPoint)point;
 - (void) moveControlPointTo:(NSPoint)point atIndex:(NSInteger)index;
 - (void) applyAffineTransform:(NSAffineTransform *)transform;
+- (NSPoint) representativePoint;
 
 @property NSRect bounds;
 @property (retain) NSManagedObjectID *objectID;

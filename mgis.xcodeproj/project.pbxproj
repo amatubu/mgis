@@ -13,6 +13,7 @@
 		2F647287114EEDC60030B47A /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2F647286114EEDC60030B47A /* UserDefaults.plist */; };
 		2F76F56F1148F20200CDBF71 /* MGISView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F76F56E1148F20200CDBF71 /* MGISView.m */; };
 		2FC121991166BBE4007A6800 /* MGISContent.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FC121981166BBE4007A6800 /* MGISContent.m */; };
+		2FC122AC1166EC6A007A6800 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2FC122AB1166EC6A007A6800 /* Localizable.strings */; };
 		2FD4181211523B2C004238C9 /* CoordinateConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FD4181111523B2C004238C9 /* CoordinateConverter.m */; };
 		2FD4199D1155F06E004238C9 /* MGISPolyline.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FD4199C1155F06E004238C9 /* MGISPolyline.m */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
@@ -36,6 +37,7 @@
 		2F76F56E1148F20200CDBF71 /* MGISView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGISView.m; sourceTree = "<group>"; };
 		2FC121971166BBE4007A6800 /* MGISContent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGISContent.h; sourceTree = "<group>"; };
 		2FC121981166BBE4007A6800 /* MGISContent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGISContent.m; sourceTree = "<group>"; };
+		2FC122A51166EB28007A6800 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		2FD4181011523B2C004238C9 /* CoordinateConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoordinateConverter.h; sourceTree = "<group>"; };
 		2FD4181111523B2C004238C9 /* CoordinateConverter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoordinateConverter.m; sourceTree = "<group>"; };
 		2FD4199B1155F06E004238C9 /* MGISPolyline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGISPolyline.h; sourceTree = "<group>"; };
@@ -129,6 +131,7 @@
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				1DDD58140DA1D0A300B32029 /* MainMenu.xib */,
 				2F647286114EEDC60030B47A /* UserDefaults.plist */,
+				2FC122AB1166EC6A007A6800 /* Localizable.strings */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -196,6 +199,7 @@
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */,
 				2F647287114EEDC60030B47A /* UserDefaults.plist in Resources */,
+				2FC122AC1166EC6A007A6800 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -233,6 +237,14 @@
 				1DDD58150DA1D0A300B32029 /* English */,
 			);
 			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		2FC122AB1166EC6A007A6800 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2FC122A51166EB28007A6800 /* English */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

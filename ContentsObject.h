@@ -46,11 +46,13 @@
 - (IBAction) createPointContent:(id)sender;
 - (IBAction) createPolylineContent:(id)sender;
 - (IBAction) createPolygonContent:(id)sender;
-- (IBAction) createTextContent:(id)sernder;
+- (IBAction) createTextContent:(id)sender;
 
-- (void) insertContent:(NSData *)aContent ofClass:(Class)aClass;
-- (void) setContent:(NSData *)aContent ofClass:(Class)aClass atObjectID:(NSManagedObjectID *)objectID;
+- (void) insertContent:(NSData *)aContent ofClass:(Class)aClass atPoint:(NSPoint)point;
+- (void) setContent:(NSData *)aContent ofClass:(Class)aClass atObjectID:(NSManagedObjectID *)objectID atPoint:(NSPoint)point;
 - (void) showShapePanel;
 - (void) closeShapePanel;
+
+- (IBAction) scrollToContent:(id)sender;
 
 @end

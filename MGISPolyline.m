@@ -278,6 +278,32 @@ NSString *ContentLineColorKey = @"lineColor";
     [self.shapeBezier transformUsingAffineTransform:transform];
 }
 
+// 代表点を得る
+// ポリラインの代表点は、真ん中の線分の中点。線分の数が偶数ならば、真ん中の点
+- (NSPoint)representativePoint {
+    NSInteger elementCount = [self.shapeBezier elementCount];
+    NSBezierPathElement element;
+    NSPoint controlPoint[3];
+    
+    if ( elementCount % 2 == 0 ) {
+        // 点の数が偶数→真ん中の線分の中点
+        NSPoint result;
+        NSBezierPathElement element = [self.shapeBezier elementAtIndex:( elementCount / 2 - 1)
+                                                      associatedPoints:&controlPoint[0]];
+        result = controlPoint[0];
+        element = [self.shapeBezier elementAtIndex:( elementCount / 2 )
+                                  associatedPoints:&controlPoint[0]];
+        result.x = ( result.x + controlPoint[0].x ) / 2;
+        result.y = ( result.y + controlPoint[0].y ) / 2;
+        return result;
+    } else {
+        // 点の数が奇数→真ん中の点
+        element = [self.shapeBezier elementAtIndex:floor( elementCount / 2 )
+                                  associatedPoints:&controlPoint[0]];
+        return controlPoint[0];
+    }
+}
+
 // プライベート関数
 
 // 線分と点の間の距離を計算

@@ -180,7 +180,7 @@
 }
 
 // コンテンツを追加する
-- (void) insertContent:(NSData *)aContent ofClass:(Class)class {
+- (void) insertContent:(NSData *)aContent ofClass:(Class)class atPoint:(NSPoint)point {
     NSManagedObjectContext *context = [self managedObjectContext];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Contents"
                                               inManagedObjectContext:context];
@@ -219,13 +219,17 @@
     [self.detailWindow makeKeyAndOrderFront:self];
 }
 
-// ポリラインを設定する
-- (void) setContent:(NSData *)aContent ofClass:(Class)class atObjectID:(NSManagedObjectID *)objectID {
+// コンテンツに図形を設定する
+- (void) setContent:(NSData *)aContent ofClass:(Class)class atObjectID:(NSManagedObjectID *)objectID atPoint:(NSPoint)point {
     NSManagedObjectContext *context = [self managedObjectContext];
 
-    // ポリラインを設定する
+    // 図形を設定する
     NSManagedObject *object = [context objectWithID:objectID];
     [object setValue:aContent forKey:@"shape"];
+    
+    // 代表点を設定する
+    [object setValue:[NSNumber numberWithFloat:point.x] forKey:@"x"];
+    [object setValue:[NSNumber numberWithFloat:point.y] forKey:@"y"];
     
     // 設定パネルを閉じる
     [self closeShapePanel];
@@ -240,6 +244,23 @@
 // 設定パネルを閉じる
 - (void) closeShapePanel {
     [self.shapeParamPanel orderOut:self];
+}
+
+// コンテンツの位置へ移動する
+- (IBAction) scrollToContent:(id)sender {
+    NSManagedObject *object = [self.contentArray selection];
+    NSLog( @"selected object x %@", [object valueForKey:@"x"] );
+    float x,y;
+    x = [[object valueForKey:@"x"] floatValue];
+    y = [[object valueForKey:@"y"] floatValue];
+    if ( x == 0.0f ) {
+        return;
+    } else {
+        mgisView.center_x = x;
+        mgisView.center_y = y;
+        [mgisView setNeedsDisplay:YES];
+        [mgisView updateInfoWindow];
+    }
 }
 
 /**
