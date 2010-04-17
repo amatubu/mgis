@@ -56,6 +56,11 @@
 - (void)deletePointAtIndex:(NSInteger)index {
 }
 
+// ポイントの位置を得る
+- (NSPoint)getPointAtIndex:(NSInteger)index {
+    return NSZeroPoint;
+}
+
 // 線の太さを設定する
 - (void)setLineWidth:(CGFloat)width {
 }
