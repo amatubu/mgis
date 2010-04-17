@@ -47,8 +47,6 @@
 
 		// 画面の中心の座標の初期値
 		// 直交座標系 VI 系
-		// TODO:
-		//   最後に表示していた場所を記録するようにしたい
 		self.center_x = 46665.476f;
 		self.center_y = -140941.652f;
 
@@ -911,14 +909,6 @@
         self.center_y = [temp floatValue];
     }
 
-    // 中心位置を設定ファイルに書き込む
-    // TODO:
-    //   ビューが閉じられる前に保存すべき
-    temp = [NSNumber numberWithFloat:self.center_x];
-    [[userPrefs values] setValue:temp forKey:@"center_x"];
-    temp = [NSNumber numberWithFloat:self.center_y];
-    [[userPrefs values] setValue:temp forKey:@"center_y"];
-    
     // ズームレベルや地図形式を初期化する
     [self changeZoomLevel:zoomSlider];
     [self changeMapFormat:mapFormat];
@@ -930,6 +920,15 @@
     // ウィンドウをアクティブにする
     [[self window] makeKeyAndOrderFront:self];
 }
+
+-(void) saveSettings {
+    // 中心位置を設定ファイルに書き込む
+    NSNumber *temp;
+    temp = [NSNumber numberWithFloat:self.center_x];
+    [[userPrefs values] setValue:temp forKey:@"center_x"];
+    temp = [NSNumber numberWithFloat:self.center_y];
+    [[userPrefs values] setValue:temp forKey:@"center_y"];
+}    
 
 
 @end

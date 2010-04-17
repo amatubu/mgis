@@ -94,6 +94,7 @@ typedef enum {
 }
 
 - (void) setupDefaults;
+- (void) saveSettings;
 
 - (void) getFirstMesh:(char *)first x:(int)x_ind y:(int)y_ind;
 - (void) getTenthMesh:(char *)second x:(int)x_ind y:(int)y_ind;

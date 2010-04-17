@@ -278,6 +278,9 @@
         return NSTerminateCancel;
     }
 	
+    // ビューの変更(中心位置)を保存する
+    [mgisView saveSettings];
+
     if (![managedObjectContext hasChanges]) return NSTerminateNow;
 	
     NSError *error = nil;
